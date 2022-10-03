@@ -1,0 +1,574 @@
+---
+title: "ASPengdaDataset"
+author: "Kwame Forbes"
+date: "10/3/2022"
+output: html_document
+---
+load Dependencies
+```{r}
+install.packages("tidyr")
+library(tidyr)
+install.packages("plyr")
+library("plyr")
+install.packages("devtools")
+library(devtools)
+devtools::install_github("kassambara/ggpubr")
+install.packages("ggpubr")
+library(ggpubr)
+install.packages('scrime')
+library("scrime")
+library(pheatmap)
+```
+
+
+
+Variables
+```{r}
+IncLevelDifference.variable = 0.05
+FDR.variable = 0.05
+counts.variable = 100
+PSIDiff = 0.1
+```
+
+
+
+Function to get PSI Difference
+```{r}
+f <- function(x, ...) {
+  abs(max(x) -min(x))
+}
+```
+
+
+
+WT vs T200M RI JC 
+```{r}
+WTvT200M_ri_jc <- read.table("/nas/longleaf/home/kwamek/AS_Pengda/RMATS-WTvT200M/BAM/RI.MATS.JC.txt",header = T)
+WTvT200M_ri_jc <- as.data.frame(WTvT200M_ri_jc)
+
+AS = as.data.frame(rep("RI",dim(WTvT200M_ri_jc)[1]))
+names(AS)[names(AS) == 'rep("RI", dim(WTvT200M_ri_jc)[1])'] <- "events"
+WTvT200M_ri_jc = cbind(WTvT200M_ri_jc,AS)
+Comparison = as.data.frame(rep("WTvT200M",dim(WTvT200M_ri_jc)[1]))
+names(Comparison)[names(Comparison) == 'rep("WTvT200M", dim(WTvT200M_ri_jc)[1])'] <- "Comparison"
+WTvT200M_ri_jc = cbind(WTvT200M_ri_jc,Comparison)
+
+WTvT200M_ri_jc = unite(WTvT200M_ri_jc,"Position",c(4:11),sep = ":",remove = T)
+WTvT200M_ri_jc$EVENT <- paste(WTvT200M_ri_jc$geneSymbol,WTvT200M_ri_jc$Position,sep = "_")
+rownames(WTvT200M_ri_jc) <- WTvT200M_ri_jc$EVENT
+WTvT200M_ri_jc <- subset(WTvT200M_ri_jc, select = -c(1:5))
+
+WTvT200M_ri_jc <- separate(WTvT200M_ri_jc, col = IJC_SAMPLE_1, into = c("IJC_SAMPLE_WT1","IJC_SAMPLE_WT2","IJC_SAMPLE_WT3"),sep = ",",remove = T)
+WTvT200M_ri_jc <- separate(WTvT200M_ri_jc, col = SJC_SAMPLE_1, into = c("SJC_SAMPLE_WT1","SJC_SAMPLE_WT2","SJC_SAMPLE_WT3"),sep = ",",remove = T)
+WTvT200M_ri_jc <- separate(WTvT200M_ri_jc, col = IJC_SAMPLE_2, into = c("IJC_SAMPLE_T200M1","IJC_SAMPLE_T200M2","IJC_SAMPLE_T200M3"),sep = ",",remove = T)
+WTvT200M_ri_jc <- separate(WTvT200M_ri_jc, col = SJC_SAMPLE_2, into = c("SJC_SAMPLE_T200M1","SJC_SAMPLE_T200M2","SJC_SAMPLE_T200M3"),sep = ",",remove = T)
+WTvT200M_ri_jc[1:12] <- as.numeric(unlist(WTvT200M_ri_jc[1:12]))
+
+WTvT200M_ri_jc <- separate(WTvT200M_ri_jc, col = IncLevel1, into = c("IncLevel_WT1","IncLevel_WT2","IncLevel_WT3"),sep = ",",remove = T)
+WTvT200M_ri_jc <- separate(WTvT200M_ri_jc, col = IncLevel2, into = c("IncLevel_T200M1","IncLevel_T200M2","IncLevel_T200M3"),sep = ",",remove = T)
+WTvT200M_ri_jc[17:22] <- as.numeric(unlist(WTvT200M_ri_jc[17:22]))
+WTvT200M_ri_jc <- na.omit(WTvT200M_ri_jc)
+WTvT200M_ri_jc$PSIDiff <- (apply(WTvT200M_ri_jc[17:22], MARGIN =  1, f,))
+
+```
+
+
+
+Filtering WT vs T200M RI JC by (SJC+IJC) >= 100, abs(IncLevelDifference) >= 0.05, and FDR <= 0.05
+```{r}
+WTvT200M_ri_jc = subset(WTvT200M_ri_jc,IJC_SAMPLE_WT1+SJC_SAMPLE_WT1>=counts.variable)
+WTvT200M_ri_jc = subset(WTvT200M_ri_jc,IJC_SAMPLE_WT2+SJC_SAMPLE_WT2>=counts.variable)
+WTvT200M_ri_jc = subset(WTvT200M_ri_jc,IJC_SAMPLE_WT3+SJC_SAMPLE_WT3>=counts.variable)
+WTvT200M_ri_jc = subset(WTvT200M_ri_jc,IJC_SAMPLE_T200M1+SJC_SAMPLE_T200M1>=counts.variable)
+WTvT200M_ri_jc = subset(WTvT200M_ri_jc,IJC_SAMPLE_T200M2+SJC_SAMPLE_T200M2>=counts.variable)
+WTvT200M_ri_jc = subset(WTvT200M_ri_jc,IJC_SAMPLE_T200M3+SJC_SAMPLE_T200M3>=counts.variable)
+
+
+WTvT200M_ri_jc <- subset(WTvT200M_ri_jc, abs(IncLevelDifference) >= IncLevelDifference.variable & FDR <= FDR.variable)
+```
+
+
+
+WT vs EV RI JC
+```{r}
+WTvEV_ri_jc <- read.table("/nas/longleaf/home/kwamek/AS_Pengda/RMATS-WTvEV/BAM/RI.MATS.JC.txt",header = T)
+WTvEV_ri_jc <- as.data.frame(WTvEV_ri_jc)
+
+AS = as.data.frame(rep("RI",dim(WTvEV_ri_jc)[1]))
+names(AS)[names(AS) == 'rep("RI", dim(WTvEV_ri_jc)[1])'] <- "events"
+WTvEV_ri_jc = cbind(WTvEV_ri_jc,AS)
+Comparison = as.data.frame(rep("WTvEV",dim(WTvEV_ri_jc)[1]))
+names(Comparison)[names(Comparison) == 'rep("WTvEV", dim(WTvEV_ri_jc)[1])'] <- "Comparison"
+WTvEV_ri_jc = cbind(WTvEV_ri_jc,Comparison)
+
+WTvEV_ri_jc = unite(WTvEV_ri_jc,"Position",c(4:11),sep = ":",remove = T)
+WTvEV_ri_jc$EVENT <- paste(WTvEV_ri_jc$geneSymbol,WTvEV_ri_jc$Position,sep = "_")
+rownames(WTvEV_ri_jc) <- WTvEV_ri_jc$EVENT
+WTvEV_ri_jc <- subset(WTvEV_ri_jc, select = -c(1:5))
+
+WTvEV_ri_jc <- separate(WTvEV_ri_jc, col = IJC_SAMPLE_1, into = c("IJC_SAMPLE_WT1","IJC_SAMPLE_WT2","IJC_SAMPLE_WT3"),sep = ",",remove = T)
+WTvEV_ri_jc <- separate(WTvEV_ri_jc, col = SJC_SAMPLE_1, into = c("SJC_SAMPLE_WT1","SJC_SAMPLE_WT2","SJC_SAMPLE_WT3"),sep = ",",remove = T)
+WTvEV_ri_jc <- separate(WTvEV_ri_jc, col = IJC_SAMPLE_2, into = c("IJC_SAMPLE_EV1","IJC_SAMPLE_EV2","IJC_SAMPLE_EV3"),sep = ",",remove = T)
+WTvEV_ri_jc <- separate(WTvEV_ri_jc, col = SJC_SAMPLE_2, into = c("SJC_SAMPLE_EV1","SJC_SAMPLE_EV2","SJC_SAMPLE_EV3"),sep = ",",remove = T)
+WTvEV_ri_jc[1:12] <- as.numeric(unlist(WTvEV_ri_jc[1:12]))
+
+WTvEV_ri_jc <- separate(WTvEV_ri_jc, col = IncLevel1, into = c("IncLevel_WT1","IncLevel_WT2","IncLevel_WT3"),sep = ",",remove = T)
+WTvEV_ri_jc <- separate(WTvEV_ri_jc, col = IncLevel2, into = c("IncLevel_EV1","IncLevel_EV2","IncLevel_EV3"),sep = ",",remove = T)
+WTvEV_ri_jc[17:22] <- as.numeric(unlist(WTvEV_ri_jc[17:22]))
+WTvEV_ri_jc <- na.omit(WTvEV_ri_jc)
+WTvEV_ri_jc$PSIDiff <- (apply(WTvEV_ri_jc[17:22], MARGIN =  1, f,))
+```
+
+
+
+Filtering WT vs EV RI JC by (SJC+IJC) >= 100, abs(IncLevelDifference) >= 0.05, and FDR <= 0.05
+```{r}
+WTvEV_ri_jc = subset(WTvEV_ri_jc,IJC_SAMPLE_EV1+SJC_SAMPLE_EV1>=counts.variable)
+WTvEV_ri_jc = subset(WTvEV_ri_jc,IJC_SAMPLE_EV2+SJC_SAMPLE_EV2>=counts.variable)
+WTvEV_ri_jc = subset(WTvEV_ri_jc,IJC_SAMPLE_EV3+SJC_SAMPLE_EV3>=counts.variable)
+
+WTvEV_ri_jc <- subset(WTvEV_ri_jc, abs(IncLevelDifference) >= IncLevelDifference.variable & FDR <= FDR.variable)
+```
+
+
+
+Combining RI (Only Events that have all three levels are included) this further filters the list
+```{r}
+RI <- merge(WTvT200M_ri_jc,WTvEV_ri_jc,by="EVENT")
+colnames(RI)<-gsub(".x","",colnames(RI))
+RI <- subset(RI, select = c(1:13,34:39,18:23,47:49,25))
+```
+
+
+
+WT vs T200M SE JC
+```{r}
+WTvT200M_se_jc <- read.table("/nas/longleaf/home/kwamek/AS_Pengda/RMATS-WTvT200M/BAM/SE.MATS.JC.txt",header = T)
+WTvT200M_se_jc <- as.data.frame(WTvT200M_se_jc)
+
+AS = as.data.frame(rep("SE",dim(WTvT200M_se_jc)[1]))
+names(AS)[names(AS) == 'rep("SE", dim(WTvT200M_se_jc)[1])'] <- "events"
+WTvT200M_se_jc = cbind(WTvT200M_se_jc,AS)
+Comparison = as.data.frame(rep("WTvT200M",dim(WTvT200M_se_jc)[1]))
+names(Comparison)[names(Comparison) == 'rep("WTvT200M", dim(WTvT200M_se_jc)[1])'] <- "Comparison"
+WTvT200M_se_jc = cbind(WTvT200M_se_jc,Comparison)
+
+WTvT200M_se_jc = unite(WTvT200M_se_jc,"Position",c(4:11),sep = ":",remove = T)
+WTvT200M_se_jc$EVENT <- paste(WTvT200M_se_jc$geneSymbol,WTvT200M_se_jc$Position,sep = "_")
+rownames(WTvT200M_se_jc) <- WTvT200M_se_jc$EVENT
+WTvT200M_se_jc <- subset(WTvT200M_se_jc, select = -c(1:5))
+
+WTvT200M_se_jc <- separate(WTvT200M_se_jc, col = IJC_SAMPLE_1, into = c("IJC_SAMPLE_WT1","IJC_SAMPLE_WT2","IJC_SAMPLE_WT3"),sep = ",",remove = T)
+WTvT200M_se_jc <- separate(WTvT200M_se_jc, col = SJC_SAMPLE_1, into = c("SJC_SAMPLE_WT1","SJC_SAMPLE_WT2","SJC_SAMPLE_WT3"),sep = ",",remove = T)
+WTvT200M_se_jc <- separate(WTvT200M_se_jc, col = IJC_SAMPLE_2, into = c("IJC_SAMPLE_T200M1","IJC_SAMPLE_T200M2","IJC_SAMPLE_T200M3"),sep = ",",remove = T)
+WTvT200M_se_jc <- separate(WTvT200M_se_jc, col = SJC_SAMPLE_2, into = c("SJC_SAMPLE_T200M1","SJC_SAMPLE_T200M2","SJC_SAMPLE_T200M3"),sep = ",",remove = T)
+WTvT200M_se_jc[1:12] <- as.numeric(unlist(WTvT200M_se_jc[1:12]))
+
+WTvT200M_se_jc <- separate(WTvT200M_se_jc, col = IncLevel1, into = c("IncLevel_WT1","IncLevel_WT2","IncLevel_WT3"),sep = ",",remove = T)
+WTvT200M_se_jc <- separate(WTvT200M_se_jc, col = IncLevel2, into = c("IncLevel_T200M1","IncLevel_T200M2","IncLevel_T200M3"),sep = ",",remove = T)
+WTvT200M_se_jc[17:22] <- as.numeric(unlist(WTvT200M_se_jc[17:22]))
+WTvT200M_se_jc <- na.omit(WTvT200M_se_jc)
+
+WTvT200M_se_jc$PSIDiff <- (apply(WTvT200M_se_jc[17:22], MARGIN =  1, f,))
+```
+
+
+
+Filtering WT vs T200M SE JC by (SJC+IJC) >= 100, abs(IncLevelDifference) >= 0.05, and FDR <= 0.05
+```{r}
+
+WTvT200M_se_jc = subset(WTvT200M_se_jc,IJC_SAMPLE_WT1+SJC_SAMPLE_WT1>=counts.variable)
+WTvT200M_se_jc = subset(WTvT200M_se_jc,IJC_SAMPLE_WT2+SJC_SAMPLE_WT2>=counts.variable)
+WTvT200M_se_jc = subset(WTvT200M_se_jc,IJC_SAMPLE_WT3+SJC_SAMPLE_WT3>=counts.variable)
+WTvT200M_se_jc = subset(WTvT200M_se_jc,IJC_SAMPLE_T200M1+SJC_SAMPLE_T200M1>=counts.variable)
+WTvT200M_se_jc = subset(WTvT200M_se_jc,IJC_SAMPLE_T200M2+SJC_SAMPLE_T200M2>=counts.variable)
+WTvT200M_se_jc = subset(WTvT200M_se_jc,IJC_SAMPLE_T200M3+SJC_SAMPLE_T200M3>=counts.variable)
+
+WTvT200M_se_jc <- subset(WTvT200M_se_jc, abs(IncLevelDifference) >= IncLevelDifference.variable & FDR <= FDR.variable)
+```
+
+
+
+WT vs EV SE JC
+```{r}
+WTvEV_se_jc <- read.table("/nas/longleaf/home/kwamek/AS_Pengda/RMATS-WTvEV/BAM/SE.MATS.JC.txt",header = T)
+WTvEV_se_jc <- as.data.frame(WTvEV_se_jc)
+
+AS = as.data.frame(rep("SE",dim(WTvEV_se_jc)[1]))
+names(AS)[names(AS) == 'rep("SE", dim(WTvEV_se_jc)[1])'] <- "events"
+WTvEV_se_jc = cbind(WTvEV_se_jc,AS)
+Comparison = as.data.frame(rep("WTvEV",dim(WTvEV_se_jc)[1]))
+names(Comparison)[names(Comparison) == 'rep("WTvEV", dim(WTvEV_se_jc)[1])'] <- "Comparison"
+WTvEV_se_jc = cbind(WTvEV_se_jc,Comparison)
+
+WTvEV_se_jc = unite(WTvEV_se_jc,"Position",c(4:11),sep = ":",remove = T)
+WTvEV_se_jc$EVENT <- paste(WTvEV_se_jc$geneSymbol,WTvEV_se_jc$Position,sep = "_")
+rownames(WTvEV_se_jc) <- WTvEV_se_jc$EVENT
+WTvEV_se_jc <- subset(WTvEV_se_jc, select = -c(1:5))
+
+WTvEV_se_jc <- separate(WTvEV_se_jc, col = IJC_SAMPLE_1, into = c("IJC_SAMPLE_WT1","IJC_SAMPLE_WT2","IJC_SAMPLE_WT3"),sep = ",",remove = T)
+WTvEV_se_jc <- separate(WTvEV_se_jc, col = SJC_SAMPLE_1, into = c("SJC_SAMPLE_WT1","SJC_SAMPLE_WT2","SJC_SAMPLE_WT3"),sep = ",",remove = T)
+WTvEV_se_jc <- separate(WTvEV_se_jc, col = IJC_SAMPLE_2, into = c("IJC_SAMPLE_EV1","IJC_SAMPLE_EV2","IJC_SAMPLE_EV3"),sep = ",",remove = T)
+WTvEV_se_jc <- separate(WTvEV_se_jc, col = SJC_SAMPLE_2, into = c("SJC_SAMPLE_EV1","SJC_SAMPLE_EV2","SJC_SAMPLE_EV3"),sep = ",",remove = T)
+WTvEV_se_jc[1:12] <- as.numeric(unlist(WTvEV_se_jc[1:12]))
+
+WTvEV_se_jc <- separate(WTvEV_se_jc, col = IncLevel1, into = c("IncLevel_WT1","IncLevel_WT2","IncLevel_WT3"),sep = ",",remove = T)
+WTvEV_se_jc <- separate(WTvEV_se_jc, col = IncLevel2, into = c("IncLevel_EV1","IncLevel_EV2","IncLevel_EV3"),sep = ",",remove = T)
+WTvEV_se_jc[17:22] <- as.numeric(unlist(WTvEV_se_jc[17:22]))
+WTvEV_se_jc <- na.omit(WTvEV_se_jc)
+
+
+WTvEV_se_jc$PSIDiff <- (apply(WTvEV_se_jc[17:22], MARGIN =  1, f,))
+```
+
+
+
+Filtering WT vs EV SE JC by (SJC+IJC) >= 100, abs(IncLevelDifference) >= 0.05, and FDR <= 0.05
+```{r}
+WTvEV_se_jc = subset(WTvEV_se_jc,IJC_SAMPLE_EV1+SJC_SAMPLE_EV1>=counts.variable)
+WTvEV_se_jc = subset(WTvEV_se_jc,IJC_SAMPLE_EV2+SJC_SAMPLE_EV2>=counts.variable)
+WTvEV_se_jc = subset(WTvEV_se_jc,IJC_SAMPLE_EV3+SJC_SAMPLE_EV3>=counts.variable)
+
+WTvEV_se_jc <- subset(WTvEV_se_jc, abs(IncLevelDifference) >= IncLevelDifference.variable & FDR <= FDR.variable)
+```
+
+
+
+Combining SE (Only Events that have all three levels are included) this further filters the list
+```{r}
+SE <- merge(WTvT200M_se_jc,WTvEV_se_jc,by="EVENT",)
+colnames(SE)<-gsub(".x","",colnames(SE))
+SE <- subset(SE, select = c(1:13,34:39,18:23,47:49,25))
+```
+
+
+
+WT vs T200M A3SS JC
+```{r}
+WTvT200M_a3ss_jc <- read.table("/nas/longleaf/home/kwamek/AS_Pengda/RMATS-WTvT200M/BAM/A3SS.MATS.JC.txt",header = T)
+WTvT200M_a3ss_jc <- as.data.frame(WTvT200M_a3ss_jc)
+
+AS = as.data.frame(rep("A3SS",dim(WTvT200M_a3ss_jc)[1]))
+names(AS)[names(AS) == 'rep("A3SS", dim(WTvT200M_a3ss_jc)[1])'] <- "events"
+WTvT200M_a3ss_jc = cbind(WTvT200M_a3ss_jc,AS)
+Comparison = as.data.frame(rep("WTvT200M",dim(WTvT200M_a3ss_jc)[1]))
+names(Comparison)[names(Comparison) == 'rep("WTvT200M", dim(WTvT200M_a3ss_jc)[1])'] <- "Comparison"
+WTvT200M_a3ss_jc = cbind(WTvT200M_a3ss_jc,Comparison)
+
+WTvT200M_a3ss_jc = unite(WTvT200M_a3ss_jc,"Position",c(4:11),sep = ":",remove = T)
+WTvT200M_a3ss_jc$EVENT <- paste(WTvT200M_a3ss_jc$geneSymbol,WTvT200M_a3ss_jc$Position,sep = "_")
+rownames(WTvT200M_a3ss_jc) <- WTvT200M_a3ss_jc$EVENT
+WTvT200M_a3ss_jc <- subset(WTvT200M_a3ss_jc, select = -c(1:5))
+
+WTvT200M_a3ss_jc <- separate(WTvT200M_a3ss_jc, col = IJC_SAMPLE_1, into = c("IJC_SAMPLE_WT1","IJC_SAMPLE_WT2","IJC_SAMPLE_WT3"),sep = ",",remove = T)
+WTvT200M_a3ss_jc <- separate(WTvT200M_a3ss_jc, col = SJC_SAMPLE_1, into = c("SJC_SAMPLE_WT1","SJC_SAMPLE_WT2","SJC_SAMPLE_WT3"),sep = ",",remove = T)
+WTvT200M_a3ss_jc <- separate(WTvT200M_a3ss_jc, col = IJC_SAMPLE_2, into = c("IJC_SAMPLE_T200M1","IJC_SAMPLE_T200M2","IJC_SAMPLE_T200M3"),sep = ",",remove = T)
+WTvT200M_a3ss_jc <- separate(WTvT200M_a3ss_jc, col = SJC_SAMPLE_2, into = c("SJC_SAMPLE_T200M1","SJC_SAMPLE_T200M2","SJC_SAMPLE_T200M3"),sep = ",",remove = T)
+WTvT200M_a3ss_jc[1:12] <- as.numeric(unlist(WTvT200M_a3ss_jc[1:12]))
+
+WTvT200M_a3ss_jc <- separate(WTvT200M_a3ss_jc, col = IncLevel1, into = c("IncLevel_WT1","IncLevel_WT2","IncLevel_WT3"),sep = ",",remove = T)
+WTvT200M_a3ss_jc <- separate(WTvT200M_a3ss_jc, col = IncLevel2, into = c("IncLevel_T200M1","IncLevel_T200M2","IncLevel_T200M3"),sep = ",",remove = T)
+WTvT200M_a3ss_jc[17:22] <- as.numeric(unlist(WTvT200M_a3ss_jc[17:22]))
+WTvT200M_a3ss_jc <- na.omit(WTvT200M_a3ss_jc)
+
+
+WTvT200M_a3ss_jc$PSIDiff <- (apply(WTvT200M_a3ss_jc[17:22], MARGIN =  1, f,))
+```
+
+
+
+Filtering WT vs T200M A3SS JC by (SJC+IJC) >= 100, abs(IncLevelDifference) >= 0.05, and FDR <= 0.05
+```{r}
+
+WTvT200M_a3ss_jc = subset(WTvT200M_a3ss_jc,IJC_SAMPLE_WT1+SJC_SAMPLE_WT1>=counts.variable)
+WTvT200M_a3ss_jc = subset(WTvT200M_a3ss_jc,IJC_SAMPLE_WT2+SJC_SAMPLE_WT2>=counts.variable)
+WTvT200M_a3ss_jc = subset(WTvT200M_a3ss_jc,IJC_SAMPLE_WT3+SJC_SAMPLE_WT3>=counts.variable)
+WTvT200M_a3ss_jc = subset(WTvT200M_a3ss_jc,IJC_SAMPLE_T200M1+SJC_SAMPLE_T200M1>=counts.variable)
+WTvT200M_a3ss_jc = subset(WTvT200M_a3ss_jc,IJC_SAMPLE_T200M2+SJC_SAMPLE_T200M2>=counts.variable)
+WTvT200M_a3ss_jc = subset(WTvT200M_a3ss_jc,IJC_SAMPLE_T200M3+SJC_SAMPLE_T200M3>=counts.variable)
+
+WTvT200M_a3ss_jc <- subset(WTvT200M_a3ss_jc, abs(IncLevelDifference) >= IncLevelDifference.variable & FDR <= FDR.variable)
+```
+
+
+
+WT vs EV A3SS JC
+```{r}
+WTvEV_a3ss_jc <- read.table("/nas/longleaf/home/kwamek/AS_Pengda/RMATS-WTvEV/BAM/A3SS.MATS.JC.txt",header = T)
+WTvEV_a3ss_jc <- as.data.frame(WTvEV_a3ss_jc)
+
+AS = as.data.frame(rep("A3SS",dim(WTvEV_a3ss_jc)[1]))
+names(AS)[names(AS) == 'rep("A3SS", dim(WTvEV_a3ss_jc)[1])'] <- "events"
+WTvEV_a3ss_jc = cbind(WTvEV_a3ss_jc,AS)
+Comparison = as.data.frame(rep("WTvEV",dim(WTvEV_a3ss_jc)[1]))
+names(Comparison)[names(Comparison) == 'rep("WTvEV", dim(WTvEV_a3ss_jc)[1])'] <- "Comparison"
+WTvEV_a3ss_jc = cbind(WTvEV_a3ss_jc,Comparison)
+
+WTvEV_a3ss_jc = unite(WTvEV_a3ss_jc,"Position",c(4:11),sep = ":",remove = T)
+WTvEV_a3ss_jc$EVENT <- paste(WTvEV_a3ss_jc$geneSymbol,WTvEV_a3ss_jc$Position,sep = "_")
+rownames(WTvEV_a3ss_jc) <- WTvEV_a3ss_jc$EVENT
+WTvEV_a3ss_jc <- subset(WTvEV_a3ss_jc, select = -c(1:5))
+
+WTvEV_a3ss_jc <- separate(WTvEV_a3ss_jc, col = IJC_SAMPLE_1, into = c("IJC_SAMPLE_WT1","IJC_SAMPLE_WT2","IJC_SAMPLE_WT3"),sep = ",",remove = T)
+WTvEV_a3ss_jc <- separate(WTvEV_a3ss_jc, col = SJC_SAMPLE_1, into = c("SJC_SAMPLE_WT1","SJC_SAMPLE_WT2","SJC_SAMPLE_WT3"),sep = ",",remove = T)
+WTvEV_a3ss_jc <- separate(WTvEV_a3ss_jc, col = IJC_SAMPLE_2, into = c("IJC_SAMPLE_EV1","IJC_SAMPLE_EV2","IJC_SAMPLE_EV3"),sep = ",",remove = T)
+WTvEV_a3ss_jc <- separate(WTvEV_a3ss_jc, col = SJC_SAMPLE_2, into = c("SJC_SAMPLE_EV1","SJC_SAMPLE_EV2","SJC_SAMPLE_EV3"),sep = ",",remove = T)
+WTvEV_a3ss_jc[1:12] <- as.numeric(unlist(WTvEV_a3ss_jc[1:12]))
+
+WTvEV_a3ss_jc <- separate(WTvEV_a3ss_jc, col = IncLevel1, into = c("IncLevel_WT1","IncLevel_WT2","IncLevel_WT3"),sep = ",",remove = T)
+WTvEV_a3ss_jc <- separate(WTvEV_a3ss_jc, col = IncLevel2, into = c("IncLevel_EV1","IncLevel_EV2","IncLevel_EV3"),sep = ",",remove = T)
+WTvEV_a3ss_jc[17:22] <- as.numeric(unlist(WTvEV_a3ss_jc[17:22]))
+WTvEV_a3ss_jc <- na.omit(WTvEV_a3ss_jc)
+
+WTvEV_a3ss_jc$PSIDiff <- (apply(WTvEV_a3ss_jc[17:22], MARGIN =  1, f,))
+```
+
+
+
+Filtering WT vs EV A3SS JC by (SJC+IJC) >= 100, abs(IncLevelDifference) >= 0.05, and FDR <= 0.05
+```{r}
+WTvEV_a3ss_jc = subset(WTvEV_a3ss_jc,IJC_SAMPLE_EV1+SJC_SAMPLE_EV1>=counts.variable)
+WTvEV_a3ss_jc = subset(WTvEV_a3ss_jc,IJC_SAMPLE_EV2+SJC_SAMPLE_EV2>=counts.variable)
+WTvEV_a3ss_jc = subset(WTvEV_a3ss_jc,IJC_SAMPLE_EV3+SJC_SAMPLE_EV3>=counts.variable)
+
+WTvEV_a3ss_jc <- subset(WTvEV_a3ss_jc, abs(IncLevelDifference) >= IncLevelDifference.variable & FDR <= FDR.variable)
+```
+
+
+
+Combining A3SS (Only Events that have all three levels are included) this further filters the list
+```{r}
+A3SS <- merge(WTvT200M_a3ss_jc,WTvEV_a3ss_jc,by="EVENT")
+colnames(A3SS)<-gsub(".x","",colnames(A3SS))
+A3SS <- subset(A3SS, select = c(1:13,34:39,18:23,47:49,25))
+```
+
+
+
+WT vs T200M A5SS JC
+```{r}
+WTvT200M_a5ss_jc <- read.table("/nas/longleaf/home/kwamek/AS_Pengda/RMATS-WTvT200M/BAM/A5SS.MATS.JC.txt",header = T)
+WTvT200M_a5ss_jc <- as.data.frame(WTvT200M_a5ss_jc)
+
+AS = as.data.frame(rep("A5SS",dim(WTvT200M_a5ss_jc)[1]))
+names(AS)[names(AS) == 'rep("A5SS", dim(WTvT200M_a5ss_jc)[1])'] <- "events"
+WTvT200M_a5ss_jc = cbind(WTvT200M_a5ss_jc,AS)
+Comparison = as.data.frame(rep("WTvT200M",dim(WTvT200M_a5ss_jc)[1]))
+names(Comparison)[names(Comparison) == 'rep("WTvT200M", dim(WTvT200M_a5ss_jc)[1])'] <- "Comparison"
+WTvT200M_a5ss_jc = cbind(WTvT200M_a5ss_jc,Comparison)
+
+WTvT200M_a5ss_jc = unite(WTvT200M_a5ss_jc,"Position",c(4:11),sep = ":",remove = T)
+WTvT200M_a5ss_jc$EVENT <- paste(WTvT200M_a5ss_jc$geneSymbol,WTvT200M_a5ss_jc$Position,sep = "_")
+rownames(WTvT200M_a5ss_jc) <- WTvT200M_a5ss_jc$EVENT
+WTvT200M_a5ss_jc <- subset(WTvT200M_a5ss_jc, select = -c(1:5))
+
+WTvT200M_a5ss_jc <- separate(WTvT200M_a5ss_jc, col = IJC_SAMPLE_1, into = c("IJC_SAMPLE_WT1","IJC_SAMPLE_WT2","IJC_SAMPLE_WT3"),sep = ",",remove = T)
+WTvT200M_a5ss_jc <- separate(WTvT200M_a5ss_jc, col = SJC_SAMPLE_1, into = c("SJC_SAMPLE_WT1","SJC_SAMPLE_WT2","SJC_SAMPLE_WT3"),sep = ",",remove = T)
+WTvT200M_a5ss_jc <- separate(WTvT200M_a5ss_jc, col = IJC_SAMPLE_2, into = c("IJC_SAMPLE_T200M1","IJC_SAMPLE_T200M2","IJC_SAMPLE_T200M3"),sep = ",",remove = T)
+WTvT200M_a5ss_jc <- separate(WTvT200M_a5ss_jc, col = SJC_SAMPLE_2, into = c("SJC_SAMPLE_T200M1","SJC_SAMPLE_T200M2","SJC_SAMPLE_T200M3"),sep = ",",remove = T)
+WTvT200M_a5ss_jc[1:12] <- as.numeric(unlist(WTvT200M_a5ss_jc[1:12]))
+
+WTvT200M_a5ss_jc <- separate(WTvT200M_a5ss_jc, col = IncLevel1, into = c("IncLevel_WT1","IncLevel_WT2","IncLevel_WT3"),sep = ",",remove = T)
+WTvT200M_a5ss_jc <- separate(WTvT200M_a5ss_jc, col = IncLevel2, into = c("IncLevel_T200M1","IncLevel_T200M2","IncLevel_T200M3"),sep = ",",remove = T)
+WTvT200M_a5ss_jc[17:22] <- as.numeric(unlist(WTvT200M_a5ss_jc[17:22]))
+WTvT200M_a5ss_jc <- na.omit(WTvT200M_a5ss_jc)
+
+WTvT200M_a5ss_jc$PSIDiff <- (apply(WTvT200M_a5ss_jc[17:22], MARGIN =  1, f,))
+```
+
+
+
+Filtering WT vs T200M A5SS JC by (SJC+IJC) >= 100, abs(IncLevelDifference) >= 0.05, and FDR <= 0.05
+```{r}
+WTvT200M_a5ss_jc = subset(WTvT200M_a5ss_jc,IJC_SAMPLE_WT1+SJC_SAMPLE_WT1>=counts.variable)
+WTvT200M_a5ss_jc = subset(WTvT200M_a5ss_jc,IJC_SAMPLE_WT2+SJC_SAMPLE_WT2>=counts.variable)
+WTvT200M_a5ss_jc = subset(WTvT200M_a5ss_jc,IJC_SAMPLE_WT3+SJC_SAMPLE_WT3>=counts.variable)
+WTvT200M_a5ss_jc = subset(WTvT200M_a5ss_jc,IJC_SAMPLE_T200M1+SJC_SAMPLE_T200M1>=counts.variable)
+WTvT200M_a5ss_jc = subset(WTvT200M_a5ss_jc,IJC_SAMPLE_T200M2+SJC_SAMPLE_T200M2>=counts.variable)
+WTvT200M_a5ss_jc = subset(WTvT200M_a5ss_jc,IJC_SAMPLE_T200M3+SJC_SAMPLE_T200M3>=counts.variable)
+
+WTvT200M_a5ss_jc <- subset(WTvT200M_a5ss_jc, abs(IncLevelDifference) >= IncLevelDifference.variable & FDR <= FDR.variable)
+```
+
+
+
+WT vs EV A5SS JC
+```{r}
+WTvEV_a5ss_jc <- read.table("/nas/longleaf/home/kwamek/AS_Pengda/RMATS-WTvEV/BAM/A5SS.MATS.JC.txt",header = T)
+WTvEV_a5ss_jc <- as.data.frame(WTvEV_a5ss_jc)
+
+AS = as.data.frame(rep("A5SS",dim(WTvEV_a5ss_jc)[1]))
+names(AS)[names(AS) == 'rep("A5SS", dim(WTvEV_a5ss_jc)[1])'] <- "events"
+WTvEV_a5ss_jc = cbind(WTvEV_a5ss_jc,AS)
+Comparison = as.data.frame(rep("WTvEV",dim(WTvEV_a5ss_jc)[1]))
+names(Comparison)[names(Comparison) == 'rep("WTvEV", dim(WTvEV_a5ss_jc)[1])'] <- "Comparison"
+WTvEV_a5ss_jc = cbind(WTvEV_a5ss_jc,Comparison)
+
+WTvEV_a5ss_jc = unite(WTvEV_a5ss_jc,"Position",c(4:11),sep = ":",remove = T)
+WTvEV_a5ss_jc$EVENT <- paste(WTvEV_a5ss_jc$geneSymbol,WTvEV_a5ss_jc$Position,sep = "_")
+rownames(WTvEV_a5ss_jc) <- WTvEV_a5ss_jc$EVENT
+WTvEV_a5ss_jc <- subset(WTvEV_a5ss_jc, select = -c(1:5))
+
+WTvEV_a5ss_jc <- separate(WTvEV_a5ss_jc, col = IJC_SAMPLE_1, into = c("IJC_SAMPLE_WT1","IJC_SAMPLE_WT2","IJC_SAMPLE_WT3"),sep = ",",remove = T)
+WTvEV_a5ss_jc <- separate(WTvEV_a5ss_jc, col = SJC_SAMPLE_1, into = c("SJC_SAMPLE_WT1","SJC_SAMPLE_WT2","SJC_SAMPLE_WT3"),sep = ",",remove = T)
+WTvEV_a5ss_jc <- separate(WTvEV_a5ss_jc, col = IJC_SAMPLE_2, into = c("IJC_SAMPLE_EV1","IJC_SAMPLE_EV2","IJC_SAMPLE_EV3"),sep = ",",remove = T)
+WTvEV_a5ss_jc <- separate(WTvEV_a5ss_jc, col = SJC_SAMPLE_2, into = c("SJC_SAMPLE_EV1","SJC_SAMPLE_EV2","SJC_SAMPLE_EV3"),sep = ",",remove = T)
+WTvEV_a5ss_jc[1:12] <- as.numeric(unlist(WTvEV_a5ss_jc[1:12]))
+
+WTvEV_a5ss_jc <- separate(WTvEV_a5ss_jc, col = IncLevel1, into = c("IncLevel_WT1","IncLevel_WT2","IncLevel_WT3"),sep = ",",remove = T)
+WTvEV_a5ss_jc <- separate(WTvEV_a5ss_jc, col = IncLevel2, into = c("IncLevel_EV1","IncLevel_EV2","IncLevel_EV3"),sep = ",",remove = T)
+WTvEV_a5ss_jc[17:22] <- as.numeric(unlist(WTvEV_a5ss_jc[17:22]))
+WTvEV_a5ss_jc <- na.omit(WTvEV_a5ss_jc)
+
+WTvEV_a5ss_jc$PSIDiff <- (apply(WTvEV_a5ss_jc[17:22], MARGIN =  1, f,))
+```
+
+
+
+Filtering WT vs EV A5SS JC by (SJC+IJC) >= 100, abs(IncLevelDifference) >= 0.05, and FDR <= 0.05
+```{r}
+WTvEV_a5ss_jc = subset(WTvEV_a5ss_jc,IJC_SAMPLE_EV1+SJC_SAMPLE_EV1>=counts.variable)
+WTvEV_a5ss_jc = subset(WTvEV_a5ss_jc,IJC_SAMPLE_EV2+SJC_SAMPLE_EV2>=counts.variable)
+WTvEV_a5ss_jc = subset(WTvEV_a5ss_jc,IJC_SAMPLE_EV3+SJC_SAMPLE_EV3>=counts.variable)
+
+WTvEV_a5ss_jc <- subset(WTvEV_a5ss_jc, abs(IncLevelDifference) >= IncLevelDifference.variable & FDR <= FDR.variable)
+```
+
+
+
+Combining A3SS (Only Events that have all three levels are included) this further filters the list
+```{r}
+A5SS <- merge(WTvT200M_a5ss_jc,WTvEV_a5ss_jc,by="EVENT",)
+colnames(A5SS)<-gsub(".x","",colnames(A5SS))
+A5SS <- subset(A5SS, select = c(1:13,34:39,18:23,47:49,25))
+```
+
+
+
+WT vs T200M MXE JC
+```{r}
+WTvT200M_mxe_jc <- read.table("/nas/longleaf/home/kwamek/AS_Pengda/RMATS-WTvT200M/BAM/MXE.MATS.JC.txt",header = T)
+WTvT200M_mxe_jc <- as.data.frame(WTvT200M_mxe_jc)
+
+AS = as.data.frame(rep("MXE",dim(WTvT200M_mxe_jc)[1]))
+names(AS)[names(AS) == 'rep("MXE", dim(WTvT200M_mxe_jc)[1])'] <- "events"
+WTvT200M_mxe_jc = cbind(WTvT200M_mxe_jc,AS)
+Comparison = as.data.frame(rep("WTvT200M",dim(WTvT200M_mxe_jc)[1]))
+names(Comparison)[names(Comparison) == 'rep("WTvT200M", dim(WTvT200M_mxe_jc)[1])'] <- "Comparison"
+WTvT200M_mxe_jc = cbind(WTvT200M_mxe_jc,Comparison)
+
+WTvT200M_mxe_jc = unite(WTvT200M_mxe_jc,"Position",c(4:13),sep = ":",remove = T)
+WTvT200M_mxe_jc$EVENT <- paste(WTvT200M_mxe_jc$geneSymbol,WTvT200M_mxe_jc$Position,sep = "_")
+rownames(WTvT200M_mxe_jc) <- WTvT200M_mxe_jc$EVENT
+WTvT200M_mxe_jc <- subset(WTvT200M_mxe_jc, select = -c(1:5))
+
+WTvT200M_mxe_jc <- separate(WTvT200M_mxe_jc, col = IJC_SAMPLE_1, into = c("IJC_SAMPLE_WT1","IJC_SAMPLE_WT2","IJC_SAMPLE_WT3"),sep = ",",remove = T)
+WTvT200M_mxe_jc <- separate(WTvT200M_mxe_jc, col = SJC_SAMPLE_1, into = c("SJC_SAMPLE_WT1","SJC_SAMPLE_WT2","SJC_SAMPLE_WT3"),sep = ",",remove = T)
+WTvT200M_mxe_jc <- separate(WTvT200M_mxe_jc, col = IJC_SAMPLE_2, into = c("IJC_SAMPLE_T200M1","IJC_SAMPLE_T200M2","IJC_SAMPLE_T200M3"),sep = ",",remove = T)
+WTvT200M_mxe_jc <- separate(WTvT200M_mxe_jc, col = SJC_SAMPLE_2, into = c("SJC_SAMPLE_T200M1","SJC_SAMPLE_T200M2","SJC_SAMPLE_T200M3"),sep = ",",remove = T)
+WTvT200M_mxe_jc[1:12] <- as.numeric(unlist(WTvT200M_mxe_jc[1:12]))
+
+WTvT200M_mxe_jc <- separate(WTvT200M_mxe_jc, col = IncLevel1, into = c("IncLevel_WT1","IncLevel_WT2","IncLevel_WT3"),sep = ",",remove = T)
+WTvT200M_mxe_jc <- separate(WTvT200M_mxe_jc, col = IncLevel2, into = c("IncLevel_T200M1","IncLevel_T200M2","IncLevel_T200M3"),sep = ",",remove = T)
+WTvT200M_mxe_jc[17:22] <- as.numeric(unlist(WTvT200M_mxe_jc[17:22]))
+WTvT200M_mxe_jc <- na.omit(WTvT200M_mxe_jc)
+
+
+WTvT200M_mxe_jc$PSIDiff <- (apply(WTvT200M_mxe_jc[17:22], MARGIN =  1, f,))
+```
+
+
+
+Filtering WT vs T200M MXE JC by (SJC+IJC) >= 100, abs(IncLevelDifference) >= 0.05, and FDR <= 0.05
+```{r}
+WTvT200M_mxe_jc = subset(WTvT200M_mxe_jc,IJC_SAMPLE_WT1+SJC_SAMPLE_WT1>=counts.variable)
+WTvT200M_mxe_jc = subset(WTvT200M_mxe_jc,IJC_SAMPLE_WT2+SJC_SAMPLE_WT2>=counts.variable)
+WTvT200M_mxe_jc = subset(WTvT200M_mxe_jc,IJC_SAMPLE_WT3+SJC_SAMPLE_WT3>=counts.variable)
+WTvT200M_mxe_jc = subset(WTvT200M_mxe_jc,IJC_SAMPLE_T200M1+SJC_SAMPLE_T200M1>=counts.variable)
+WTvT200M_mxe_jc = subset(WTvT200M_mxe_jc,IJC_SAMPLE_T200M2+SJC_SAMPLE_T200M2>=counts.variable)
+WTvT200M_mxe_jc = subset(WTvT200M_mxe_jc,IJC_SAMPLE_T200M3+SJC_SAMPLE_T200M3>=counts.variable)
+
+WTvT200M_mxe_jc <- subset(WTvT200M_mxe_jc, abs(IncLevelDifference) >= IncLevelDifference.variable & FDR <= FDR.variable)
+```
+
+
+
+WT vs EV MXE JC
+```{r}
+WTvEV_mxe_jc <- read.table("/nas/longleaf/home/kwamek/AS_Pengda/RMATS-WTvEV/BAM/MXE.MATS.JC.txt",header = T)
+WTvEV_mxe_jc <- as.data.frame(WTvEV_mxe_jc)
+
+AS = as.data.frame(rep("MXE",dim(WTvEV_mxe_jc)[1]))
+names(AS)[names(AS) == 'rep("MXE", dim(WTvEV_mxe_jc)[1])'] <- "events"
+WTvEV_mxe_jc = cbind(WTvEV_mxe_jc,AS)
+Comparison = as.data.frame(rep("WTvEV",dim(WTvEV_mxe_jc)[1]))
+names(Comparison)[names(Comparison) == 'rep("WTvEV", dim(WTvEV_mxe_jc)[1])'] <- "Comparison"
+WTvEV_mxe_jc = cbind(WTvEV_mxe_jc,Comparison)
+
+WTvEV_mxe_jc = unite(WTvEV_mxe_jc,"Position",c(4:13),sep = ":",remove = T)
+WTvEV_mxe_jc$EVENT <- paste(WTvEV_mxe_jc$geneSymbol,WTvEV_mxe_jc$Position,sep = "_")
+rownames(WTvEV_mxe_jc) <- WTvEV_mxe_jc$EVENT
+WTvEV_mxe_jc <- subset(WTvEV_mxe_jc, select = -c(1:5))
+
+WTvEV_mxe_jc <- separate(WTvEV_mxe_jc, col = IJC_SAMPLE_1, into = c("IJC_SAMPLE_WT1","IJC_SAMPLE_WT2","IJC_SAMPLE_WT3"),sep = ",",remove = T)
+WTvEV_mxe_jc <- separate(WTvEV_mxe_jc, col = SJC_SAMPLE_1, into = c("SJC_SAMPLE_WT1","SJC_SAMPLE_WT2","SJC_SAMPLE_WT3"),sep = ",",remove = T)
+WTvEV_mxe_jc <- separate(WTvEV_mxe_jc, col = IJC_SAMPLE_2, into = c("IJC_SAMPLE_EV1","IJC_SAMPLE_EV2","IJC_SAMPLE_EV3"),sep = ",",remove = T)
+WTvEV_mxe_jc <- separate(WTvEV_mxe_jc, col = SJC_SAMPLE_2, into = c("SJC_SAMPLE_EV1","SJC_SAMPLE_EV2","SJC_SAMPLE_EV3"),sep = ",",remove = T)
+WTvEV_mxe_jc[1:12] <- as.numeric(unlist(WTvEV_mxe_jc[1:12]))
+
+WTvEV_mxe_jc <- separate(WTvEV_mxe_jc, col = IncLevel1, into = c("IncLevel_WT1","IncLevel_WT2","IncLevel_WT3"),sep = ",",remove = T)
+WTvEV_mxe_jc <- separate(WTvEV_mxe_jc, col = IncLevel2, into = c("IncLevel_EV1","IncLevel_EV2","IncLevel_EV3"),sep = ",",remove = T)
+WTvEV_mxe_jc[17:22] <- as.numeric(unlist(WTvEV_mxe_jc[17:22]))
+WTvEV_mxe_jc <- na.omit(WTvEV_mxe_jc)
+
+WTvEV_mxe_jc$PSIDiff <- (apply(WTvEV_mxe_jc[17:22], MARGIN =  1, f,))
+```
+
+
+
+Filtering WT vs EV MXE JC by (SJC+IJC) >= 100, abs(IncLevelDifference) >= 0.05, and FDR <= 0.05
+```{r}
+WTvEV_mxe_jc = subset(WTvEV_mxe_jc,IJC_SAMPLE_EV1+SJC_SAMPLE_EV1>=counts.variable)
+WTvEV_mxe_jc = subset(WTvEV_mxe_jc,IJC_SAMPLE_EV2+SJC_SAMPLE_EV2>=counts.variable)
+WTvEV_mxe_jc = subset(WTvEV_mxe_jc,IJC_SAMPLE_EV3+SJC_SAMPLE_EV3>=counts.variable)
+
+WTvEV_mxe_jc <- subset(WTvEV_mxe_jc, abs(IncLevelDifference) >= IncLevelDifference.variable & FDR <= FDR.variable)
+```
+
+
+
+Combining MXE (Only Events that have all three levels are included) this further filters the list
+```{r}
+MXE <- merge(WTvT200M_mxe_jc,WTvEV_mxe_jc,by="EVENT",)
+colnames(MXE)<-gsub(".x","",colnames(MXE))
+MXE <- subset(MXE, select = c(1:13,34:39,18:23,47:49,25))
+```
+
+
+
+Combining ALL AS EVENTS that have been filtered
+```{r}
+Pengda_AS_events <- rbind(RI,SE,A3SS,A5SS,MXE)
+rownames(Pengda_AS_events) <- rownames(Pengda_AS_events$EVENT)
+write.csv(Pengda_AS_events,"Pengda-AS-JC-nonorm-50counts-INCLvl_FDR.csv")
+```
+
+
+
+PheatMap 
+```{r}
+
+Anno <- data.frame(EVENT = Pengda_AS_events$events)
+pheatmap(Pengda_AS_events[20:28], cluster_rows=F, show_rownames=F,
+         cluster_cols=T, main = "Filtered",border_color = T,
+         annotation_row = Anno,
+         color=colorRampPalette(c("red", "white", "blue"))(150),
+         fontsize = 12)
+```
+
+
+
+
+
+
+
