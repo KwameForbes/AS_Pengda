@@ -549,6 +549,7 @@ MXE <- subset(MXE, select = c(1:13,34:39,18:23,47:49,25))
 Combining ALL AS EVENTS that have been filtered
 ```{r}
 Pengda_AS_events <- rbind(RI,SE,A3SS,A5SS,MXE)
+Pengda_AS_events <- na.omit(Pengda_AS_events)
 rownames(Pengda_AS_events) <- rownames(Pengda_AS_events$EVENT)
 write.csv(Pengda_AS_events,"Pengda-AS-JC-nonorm-50counts-INCLvl_FDR.csv")
 ```
@@ -559,8 +560,12 @@ PheatMap
 ```{r}
 
 Anno <- data.frame(EVENT = Pengda_AS_events$events)
+
+rownames(Pengda_AS_events) <- Pengda_AS_events$EVENT
+rownames(Anno) <- Pengda_AS_events$EVENT
+
 pheatmap(Pengda_AS_events[20:28], cluster_rows=F, show_rownames=F,
-         cluster_cols=T, main = "Filtered",border_color = T,
+         cluster_cols=F, main = "Filtered Events",border_color = T,
          annotation_row = Anno,
          color=colorRampPalette(c("red", "white", "blue"))(150),
          fontsize = 12)
