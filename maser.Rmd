@@ -1,0 +1,81 @@
+---
+title: "maser"
+author: "Kwame Forbes"
+date: "10/19/2022"
+output: html_document
+---
+ maser (Mapping Alternative Splicing Events to pRoteins) package to enable functional characterization of splicing in both transcriptomic and proteomic contexts. 
+ 
+ 
+load dependency 
+```{r}
+BiocManager::install("maser")
+library(maser)
+library(rtracklayer)
+library(ggplot2)
+library(ggpubr)
+```
+
+variables
+```{r}
+avg_reads = 5
+fdr = 0.05
+deltaPSI = 0.1
+```
+
+
+Loading Data
+```{r}
+path <- system.file(" ", file.path("/pine/scr/k/w/kwamek/pengda_collab/RMATS-WTvT200M/BAM"),
+                    package = "maser")
+pathway <- "/pine/scr/k/w/kwamek/pengda_collab/RMATS-WTvT200M/BAM"
+
+pengda_maser <- maser(pathway, c("WT", "T200M"), ftype = "JC")
+
+pengda_maser
+
+```
+
+
+filtering
+```{r}
+pengda_filt <- filterByCoverage(pengda_maser, avg_reads >= avg_reads)
+pengda_filt
+
+pengda_top <- topEvents(pengda_filt, fdr = fdr, deltaPSI = deltaPSI)
+pengda_top
+
+top_ri_genes <- as.data.frame(pengda_top@RI_counts)
+top_ri_genes$Means <- (apply(top_ri_genes[1:6], MARGIN = 1,mx,))
+
+```
+
+
+Looking at genes
+```{r}
+#GBL, GbetaL, Lst8, Pop3
+mlst8 <- geneEvents(pengda_filt, geneS = "MLST*",fdr = 0.5,deltaPSI = 0.1)
+mlst8 
+
+A <-pca(pengda_filt,type = "RI")
+B <- volcano(pengda_top, fdr = 0.05, deltaPSI = 0.1, type = "RI")
+C <- boxplot_PSI_levels(pengda_top,type = "RI")
+
+gg <- ggarrange(A,B,C, 
+          labels = c("A.PCA", "B.VOLCANO","C.BOX"),
+          ncol = 3, nrow = 1)
+
+
+
+```
+
+
+
+
+
+
+
+
+
+
+
