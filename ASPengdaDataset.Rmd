@@ -6,16 +6,10 @@ output: html_document
 ---
 load Dependencies
 ```{r}
-install.packages("tidyr")
 library(tidyr)
-install.packages("plyr")
 library("plyr")
-install.packages("devtools")
 library(devtools)
-devtools::install_github("kassambara/ggpubr")
-install.packages("ggpubr")
 library(ggpubr)
-install.packages('scrime')
 library("scrime")
 library(pheatmap)
 ```
@@ -83,7 +77,8 @@ WTvT200M_ri_jc <- subset(WTvT200M_ri_jc,
                          &apply(WTvT200M_ri_jc[c(2,5)], MARGIN =  1,mean)>=coverage
                          &apply(WTvT200M_ri_jc[c(3,6)], MARGIN =  1,mean)>=coverage
                          &apply(WTvT200M_ri_jc[c(7,10)], MARGIN =  1,mean)>=coverage
-                         &apply(WTvT200M_ri_jc[c(8,11)], MARGIN =  1,mean)>=coverage)
+                         &apply(WTvT200M_ri_jc[c(8,11)], MARGIN =  1,mean)>=coverage
+                         &apply(WTvT200M_ri_jc[c(9,12)], MARGIN =  1,mean)>=coverage)
 
 WTvT200M_ri_jc <- subset(WTvT200M_ri_jc, abs(IncLevelDifference) >= IncLevelDifference.variable & FDR <= FDR.variable)
 ```
@@ -128,7 +123,9 @@ WTvEV_ri_jc <- subset(WTvEV_ri_jc,
                          &apply(WTvEV_ri_jc[c(2,5)], MARGIN =  1,mean)>=coverage
                          &apply(WTvEV_ri_jc[c(3,6)], MARGIN =  1,mean)>=coverage
                          &apply(WTvEV_ri_jc[c(7,10)], MARGIN =  1,mean)>=coverage
-                         &apply(WTvEV_ri_jc[c(8,11)], MARGIN =  1,mean)>=coverage)
+                         &apply(WTvEV_ri_jc[c(8,11)], MARGIN =  1,mean)>=coverage
+                         &apply(WTvEV_ri_jc[c(9,12)], MARGIN =  1,mean)>=coverage)
+                      
 
 WTvEV_ri_jc <- subset(WTvEV_ri_jc, abs(IncLevelDifference) >= IncLevelDifference.variable & FDR <= FDR.variable)
 ```
@@ -182,7 +179,8 @@ WTvT200M_se_jc <- subset(WTvT200M_se_jc,
                          &apply(WTvT200M_se_jc[c(2,5)], MARGIN =  1,mean)>=coverage
                          &apply(WTvT200M_se_jc[c(3,6)], MARGIN =  1,mean)>=coverage
                          &apply(WTvT200M_se_jc[c(7,10)], MARGIN =  1,mean)>=coverage
-                         &apply(WTvT200M_se_jc[c(8,11)], MARGIN =  1,mean)>=coverage)
+                         &apply(WTvT200M_se_jc[c(8,11)], MARGIN =  1,mean)>=coverage
+                         &apply(WTvT200M_se_jc[c(9,12)], MARGIN =  1,mean)>=coverage)
 
 WTvT200M_se_jc <- subset(WTvT200M_se_jc, abs(IncLevelDifference) >= IncLevelDifference.variable & FDR <= FDR.variable)
 ```
@@ -227,7 +225,8 @@ WTvEV_se_jc <- subset(WTvEV_se_jc,
                          &apply(WTvEV_se_jc[c(2,5)], MARGIN =  1,mean)>=coverage
                          &apply(WTvEV_se_jc[c(3,6)], MARGIN =  1,mean)>=coverage
                          &apply(WTvEV_se_jc[c(7,10)], MARGIN =  1,mean)>=coverage
-                         &apply(WTvEV_se_jc[c(8,11)], MARGIN =  1,mean)>=coverage)
+                         &apply(WTvEV_se_jc[c(8,11)], MARGIN =  1,mean)>=coverage
+                         &apply(WTvEV_se_jc[c(9,12)], MARGIN =  1,mean)>=coverage)
 
 WTvEV_se_jc <- subset(WTvEV_se_jc, abs(IncLevelDifference) >= IncLevelDifference.variable & FDR <= FDR.variable)
 ```
@@ -281,7 +280,8 @@ WTvT200M_a3ss_jc <- subset(WTvT200M_a3ss_jc,
                          &apply(WTvT200M_a3ss_jc[c(2,5)], MARGIN =  1,mean)>=coverage
                          &apply(WTvT200M_a3ss_jc[c(3,6)], MARGIN =  1,mean)>=coverage
                          &apply(WTvT200M_a3ss_jc[c(7,10)], MARGIN =  1,mean)>=coverage
-                         &apply(WTvT200M_a3ss_jc[c(8,11)], MARGIN =  1,mean)>=coverage)
+                         &apply(WTvT200M_a3ss_jc[c(8,11)], MARGIN =  1,mean)>=coverage
+                         &apply(WTvT200M_a3ss_jc[c(9,12)], MARGIN =  1,mean)>=coverage)
 
 WTvT200M_a3ss_jc <- subset(WTvT200M_a3ss_jc, abs(IncLevelDifference) >= IncLevelDifference.variable & FDR <= FDR.variable)
 ```
@@ -326,7 +326,8 @@ WTvEV_a3ss_jc <- subset(WTvEV_a3ss_jc,
                          &apply(WTvEV_a3ss_jc[c(2,5)], MARGIN =  1,mean)>=coverage
                          &apply(WTvEV_a3ss_jc[c(3,6)], MARGIN =  1,mean)>=coverage
                          &apply(WTvEV_a3ss_jc[c(7,10)], MARGIN =  1,mean)>=coverage
-                         &apply(WTvEV_a3ss_jc[c(8,11)], MARGIN =  1,mean)>=coverage)
+                         &apply(WTvEV_a3ss_jc[c(8,11)], MARGIN =  1,mean)>=coverage
+                         &apply(WTvEV_a3ss_jc[c(9,12)], MARGIN =  1,mean)>=coverage)
 
 WTvEV_a3ss_jc <- subset(WTvEV_a3ss_jc, abs(IncLevelDifference) >= IncLevelDifference.variable & FDR <= FDR.variable)
 ```
@@ -380,7 +381,8 @@ WTvT200M_a5ss_jc <- subset(WTvT200M_a5ss_jc,
                          &apply(WTvT200M_a5ss_jc[c(2,5)], MARGIN =  1,mean)>=coverage
                          &apply(WTvT200M_a5ss_jc[c(3,6)], MARGIN =  1,mean)>=coverage
                          &apply(WTvT200M_a5ss_jc[c(7,10)], MARGIN =  1,mean)>=coverage
-                         &apply(WTvT200M_a5ss_jc[c(8,11)], MARGIN =  1,mean)>=coverage)
+                         &apply(WTvT200M_a5ss_jc[c(8,11)], MARGIN =  1,mean)>=coverage
+                         &apply(WTvT200M_a5ss_jc[c(9,12)], MARGIN =  1,mean)>=coverage)
 
 WTvT200M_a5ss_jc <- subset(WTvT200M_a5ss_jc, abs(IncLevelDifference) >= IncLevelDifference.variable & FDR <= FDR.variable)
 ```
@@ -425,7 +427,8 @@ WTvEV_a5ss_jc <- subset(WTvEV_a5ss_jc,
                          &apply(WTvEV_a5ss_jc[c(2,5)], MARGIN =  1,mean)>=coverage
                          &apply(WTvEV_a5ss_jc[c(3,6)], MARGIN =  1,mean)>=coverage
                          &apply(WTvEV_a5ss_jc[c(7,10)], MARGIN =  1,mean)>=coverage
-                         &apply(WTvEV_a5ss_jc[c(8,11)], MARGIN =  1,mean)>=coverage)
+                         &apply(WTvEV_a5ss_jc[c(8,11)], MARGIN =  1,mean)>=coverage
+                         &apply(WTvEV_a5ss_jc[c(9,12)], MARGIN =  1,mean)>=coverage)
 
 WTvEV_a5ss_jc <- subset(WTvEV_a5ss_jc, abs(IncLevelDifference) >= IncLevelDifference.variable & FDR <= FDR.variable)
 ```
@@ -479,7 +482,8 @@ WTvT200M_mxe_jc <- subset(WTvT200M_mxe_jc,
                          &apply(WTvT200M_mxe_jc[c(2,5)], MARGIN =  1,mean)>=coverage
                          &apply(WTvT200M_mxe_jc[c(3,6)], MARGIN =  1,mean)>=coverage
                          &apply(WTvT200M_mxe_jc[c(7,10)], MARGIN =  1,mean)>=coverage
-                         &apply(WTvT200M_mxe_jc[c(8,11)], MARGIN =  1,mean)>=coverage)
+                         &apply(WTvT200M_mxe_jc[c(8,11)], MARGIN =  1,mean)>=coverage
+                         &apply(WTvT200M_mxe_jc[c(9,12)], MARGIN =  1,mean)>=coverage)
 
 WTvT200M_mxe_jc <- subset(WTvT200M_mxe_jc, abs(IncLevelDifference) >= IncLevelDifference.variable & FDR <= FDR.variable)
 ```
@@ -524,7 +528,8 @@ WTvEV_mxe_jc <- subset(WTvEV_mxe_jc,
                          &apply(WTvEV_mxe_jc[c(2,5)], MARGIN =  1,mean)>=coverage
                          &apply(WTvEV_mxe_jc[c(3,6)], MARGIN =  1,mean)>=coverage
                          &apply(WTvEV_mxe_jc[c(7,10)], MARGIN =  1,mean)>=coverage
-                         &apply(WTvEV_mxe_jc[c(8,11)], MARGIN =  1,mean)>=coverage)
+                         &apply(WTvEV_mxe_jc[c(8,11)], MARGIN =  1,mean)>=coverage
+                         &apply(WTvEV_mxe_jc[c(9,12)], MARGIN =  1,mean)>=coverage)
 
 WTvEV_mxe_jc <- subset(WTvEV_mxe_jc, abs(IncLevelDifference) >= IncLevelDifference.variable & FDR <= FDR.variable)
 ```
