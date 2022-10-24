@@ -45,8 +45,7 @@ pengda_filt
 pengda_top <- topEvents(pengda_filt, fdr = fdr, deltaPSI = deltaPSI)
 pengda_top
 
-top_ri_genes <- as.data.frame(pengda_top@RI_counts)
-top_ri_genes$Means <- (apply(top_ri_genes[1:6], MARGIN = 1,mx,))
+top_ri_genes <- as.data.frame(pengda_top@RI_events$geneSymbol)
 
 ```
 
