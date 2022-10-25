@@ -1,0 +1,31 @@
+---
+title: "ASPengdaDataset-WTvsEV-JC"
+author: "Kwame Forbes"
+date: "10/21/2022"
+output: html_document
+---
+
+load Dependencies
+```{r}
+install.packages("tidyr")
+library(tidyr)
+install.packages("plyr")
+library("plyr")
+install.packages("devtools")
+library(devtools)
+devtools::install_github("kassambara/ggpubr")
+install.packages("ggpubr")
+library(ggpubr)
+install.packages('scrime')
+library("scrime")
+library(pheatmap)
+```
+
+WT vs EV JC only.
+
+Variables
+```{r}
+IncLevelDifference.variable = 0.1
+FDR.variable = 0.05
+coverage = 100
+```
