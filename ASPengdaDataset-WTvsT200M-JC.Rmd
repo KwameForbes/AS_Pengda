@@ -268,6 +268,8 @@ Combining ALL AS EVENTS that have been filtered
 WTvT200M_jc <- rbind(WTvT200M_ri_jc,WTvT200M_se_jc,WTvT200M_a3ss_jc,WTvT200M_a5ss_jc,WTvT200M_mxe_jc)
 rownames(WTvT200M_jc) <- rownames(WTvT200M_jc$EVENT)
 colnames(WTvT200M_jc)<-gsub("IncLevel_","PSI_",colnames(WTvT200M_jc))
+WTvT200M_jc$Event <-ifelse(WTvT200M_jc$IncLevelDifference > 0,"WT","T200M")
+write.csv(WTvT200M_jc,"WTvsT200M-50counts-filtered.csv")
 ```
 
 
@@ -293,27 +295,50 @@ pheatmap(WTvT200M_jc[17:22], cluster_rows=F, show_rownames=F,
 
 Plots
 ```{r}
-p <- ggplot(data = WTvT200M_ri_jc,mapping= 
-              aes(IncLevelDifference,-log(FDR)))+ theme_classic() + geom_point(color = ifelse(WTvT200M_ri_jc$IncLevelDifference >= 0.1 ,"blue","red")) + 
-  theme_classic()+ ggtitle("WT vs. T200M RI PSI") +xlab("PSI Change") + ylab("-log10(FDR)")
-pp <- p+ theme(plot.title = element_text(color="red", size=14, face="bold.italic"),
-         axis.title.x = element_text(color="blue", size=14, face="bold"),
-         axis.title.y = element_text(color="#993333", size=14, face="bold")) + theme(axis.text = element_text(size = 15))  
+a <- ggplot(data = WTvT200M_jc,mapping= 
+              aes(x =IncLevelDifference,y =-log10(FDR),color=Event))+ theme_classic() + geom_point() + 
+   ggtitle("WT vs. T200M Percent Spliced In") +xlab("PSI") + ylab("-log10(FDR)") + scale_color_manual(values=c("red", "blue"))
+a <- a + theme(plot.title = element_text(color="black", size=20, face="bold.italic"),
+         axis.title.x = element_text(color="black", size=20, face="bold"),
+         axis.title.y = element_text(color="black", size=20, face="bold"),
+         axis.text = element_text(size = 20),
+         legend.text = element_text(size=17),
+         legend.title = element_text(size=20))  
 
-s <- ggplot(WTvT200M_ri_jc, aes(x="WTvT200M", y=IncLevelDifference)) + 
-   theme_classic()+ ggtitle("RI PSI of WTvT200M") + ylab("IncLevelDifference") + geom_violin()
+b <- ggplot(WTvT200M_jc, aes("WTvT200M", y=IncLevelDifference)) + 
+   theme_classic()+ ggtitle("WT vs T200M PSI") + ylab("IncLevelDifference") + geom_violin()
 
-s2 <- s + theme(plot.title = element_text(color="red", size=14, face="bold.italic"),
-         axis.title.x = element_text(color="blue", size=14, face="bold"),
-         axis.title.y = element_text(color="#993333", size=14, face="bold"))
+b <- b + geom_boxplot(width=0.2)+ 
+  theme(plot.title = element_text(color="black", size=20, face="bold.italic"),
+         axis.title.x = element_text(color="black", size=20, face="bold"),
+         axis.title.y = element_text(color="black", size=20, face="bold"),
+         axis.text = element_text(size = 20))
  
-s2 <- s2 + geom_boxplot(width=0.2)
+c <- ggplot(data = WTvT200M_ri_jc,mapping= 
+              aes(IncLevelDifference,-log(FDR)))+ theme_classic() + geom_point(color = ifelse(WTvT200M_ri_jc$IncLevelDifference >= 0.1 ,"blue","red")) + 
+  theme_classic()+ ggtitle("WT vs. T200M RI Percent Spliced In") +xlab("PSI") + ylab("-log10(FDR)")
+c <- c + theme(plot.title = element_text(color="black", size=20, face="bold.italic"),
+         axis.title.x = element_text(color="black", size=20, face="bold"),
+         axis.title.y = element_text(color="black", size=20, face="bold"),
+         axis.text = element_text(size = 20),
+         legend.text = element_text(size=17),
+         legend.title = element_text(size=20)) 
 
-s2 <- s2 + theme(axis.text = element_text(size = 15))  
 
-sg <- ggarrange(pp,s2, 
-          labels = c("A", "B"),
-          ncol = 2, nrow = 1)
+d <- ggplot(WTvT200M_ri_jc, aes(x="WTvT200M", y=IncLevelDifference)) + 
+   theme_classic()+ ggtitle("WT vs T200M RI PSI") + ylab("IncLevelDifference") + geom_violin()
+d <- d + geom_boxplot(width=0.2)+ 
+  theme(plot.title = element_text(color="black", size=20, face="bold.italic"),
+         axis.title.x = element_text(color="black", size=20, face="bold"),
+         axis.title.y = element_text(color="black", size=20, face="bold"),
+         axis.text = element_text(size = 20)) 
+
+
+
+
+sg <- ggarrange(a,b,c,d,
+          labels = c("A", "B", "C", "D"),
+          ncol = 2, nrow = 2)
 sg
 ```
 

@@ -9,7 +9,7 @@ output: html_document
  
 load dependency 
 ```{r}
-BiocManager::install("maser")
+#BiocManager::install("maser")
 library(maser)
 library(rtracklayer)
 library(ggplot2)
