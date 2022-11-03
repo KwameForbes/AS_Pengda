@@ -6,16 +6,10 @@ output: html_document
 ---
 load Dependencies
 ```{r}
-#install.packages("tidyr")
 library(tidyr)
-#install.packages("plyr")
 library("plyr")
-install.packages("devtools")
 library(devtools)
-#devtools::install_github("kassambara/ggpubr")
-#install.packages("ggpubr")
 library(ggpubr)
-#install.packages('scrime')
 library("scrime")
 library(pheatmap)
 ```
@@ -270,6 +264,7 @@ rownames(WTvT200M_jc) <- rownames(WTvT200M_jc$EVENT)
 colnames(WTvT200M_jc)<-gsub("IncLevel_","PSI_",colnames(WTvT200M_jc))
 WTvT200M_jc$Event <-ifelse(WTvT200M_jc$IncLevelDifference > 0,"WT","T200M")
 write.csv(WTvT200M_jc,"WTvsT200M-50counts-filtered.csv")
+write.csv(WTvT200M_ri_jc,"WTvsT200M-RI-50counts-filtered.csv")
 ```
 
 
@@ -341,6 +336,37 @@ sg <- ggarrange(a,b,c,d,
           ncol = 2, nrow = 2)
 sg
 ```
+looking at specific genes
+```{r}
+WTvT200M_GENE <- subset(WTvT200M_ri_jc,EVENT=='MRNIP_chr5:-:179837275:179840959:179837275:179837885:179840871:179840959')
+
+condition <- c('WT','WT','WT','T200M','T200M','T200M')
+PSI <- c(WTvT200M_GENE$IncLevel_WT1,WTvT200M_GENE$IncLevel_WT2,WTvT200M_GENE$IncLevel_WT3,WTvT200M_GENE$IncLevel_T200M1,WTvT200M_GENE$IncLevel_T200M2,WTvT200M_GENE$IncLevel_T200M3)
+gene_plot <- cbind.data.frame(condition,PSI)
+d <- ggplot(gene_plot, aes(x=condition, y=PSI)) + 
+   theme_classic()+ ggtitle('MRNIP/chr5:179837885-179840871') + labs(x ='Condition',y = "PSI")
+d <- d + geom_boxplot(width=0.2, fill = c('Red','Blue'),color = 'Black' )+ 
+  theme(plot.title = element_text(color="black", size=20, face="bold.italic"),
+         axis.title.x = element_text(color="black", size=20, face="bold"),
+         axis.title.y = element_text(color="black", size=20, face="bold"),
+         axis.text = element_text(size = 20)) 
+d
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

@@ -18,7 +18,7 @@ library(ggpubr)
 
 variables
 ```{r}
-avg_reads = 5
+avg_reads = 50
 fdr = 0.05
 deltaPSI = 0.1
 ```
