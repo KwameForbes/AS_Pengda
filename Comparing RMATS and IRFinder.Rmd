@@ -1,0 +1,131 @@
+---
+title: "Comparing RMATS and IRFinder"
+author: "Kwame Forbes"
+date: "11/4/2022"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+load Dependencies
+```{r}
+library(tidyr)
+library("plyr")
+library(devtools)
+library(ggpubr)
+library("scrime")
+library(pheatmap)
+library(stringr)
+library(pheatmap)
+
+```
+
+
+
+WT vs T200M JC only.
+
+Variables
+```{r}
+IncLevelDifference.variable = 0.1
+FDR.variable = 0.05
+coverage = 50
+```
+
+
+loading IRFinder
+investigate differential IR between two conditions with replicates 
+Minimum IR ratio of  0.05 met in at least one sample to consider the intron.
+Discard the LowCover and LowSplicing
+```{r}
+IR <- as.data.frame(read.table("/nas/longleaf/home/kwamek/IR_Pengda/WTvsT200M_IRFinder.csv", sep = ",",header = T))
+IR <- subset(IR,select = (c(-1)))
+IR[c('ENSEM', 'TYPE',"POS")] <- str_split_fixed(IR$ID, ';', 3)
+IR = unite(IR,"Event_ID",c(12,14),sep = "/",remove = T)
+```
+
+
+loading RMATS
+```{r}
+RMATS <- as.data.frame(read.table("/nas/longleaf/home/kwamek/AS_Pengda/RMATS-WTvT200M/BAM/RI.MATS.JC.txt",header = T))
+RMATS = unite(RMATS,"Event_ID",c(2,4),sep = "/",remove = T)
+RMATS = unite(RMATS,"Event_ID",c(2,8),sep = ":",remove = T)
+RMATS = unite(RMATS,"Event_ID",c(2,8),sep = "-",remove = T)
+```
+
+Merging
+```{r}
+IR_RMATS <- join(IR,RMATS,by='Event_ID')
+IR_RMATS <- na.omit(IR_RMATS)
+IR_RMATS <- subset(IR_RMATS,select = c(9,12,3,7,22:25,29:32))
+IR_RMATS <- separate(IR_RMATS, col = IJC_SAMPLE_1, into = c("IJC_SAMPLE_WT1","IJC_SAMPLE_WT2","IJC_SAMPLE_WT3"),sep = ",",remove = T)
+IR_RMATS <- separate(IR_RMATS, col = SJC_SAMPLE_1, into = c("SJC_SAMPLE_WT1","SJC_SAMPLE_WT2","SJC_SAMPLE_WT3"),sep = ",",remove = T)
+IR_RMATS <- separate(IR_RMATS, col = IJC_SAMPLE_2, into = c("IJC_SAMPLE_T200M1","IJC_SAMPLE_T200M2","IJC_SAMPLE_T200M3"),sep = ",",remove = T)
+IR_RMATS <- separate(IR_RMATS, col = SJC_SAMPLE_2, into = c("SJC_SAMPLE_T200M1","SJC_SAMPLE_T200M2","SJC_SAMPLE_T200M3"),sep = ",",remove = T)
+IR_RMATS[5:16] <- as.numeric(unlist(IR_RMATS[5:16]))
+
+IR_RMATS <- separate(IR_RMATS, col = IncLevel1, into = c("IncLevel_WT1","IncLevel_WT2","IncLevel_WT3"),sep = ",",remove = T)
+IR_RMATS <- separate(IR_RMATS, col = IncLevel2, into = c("IncLevel_T200M1","IncLevel_T200M2","IncLevel_T200M3"),sep = ",",remove = T)
+IR_RMATS[18:23] <- as.numeric(unlist(IR_RMATS[18:23]))
+
+
+#Here I will look at average reads of WT and T200M
+IR_RMATS$AVG_WT <- apply(IR_RMATS[c(5:10)], MARGIN =  1,mean)
+IR_RMATS$AVG_T200M <- apply(IR_RMATS[c(11:16)], MARGIN =  1,mean)
+
+IR_RMATS <- IR_RMATS[order(IR_RMATS$log2FoldChange,decreasing = T),]
+
+IR_RMATS_sig <- subset(IR_RMATS,FDR <= FDR.variable&padj <= FDR.variable)
+
+```
+
+
+
+
+PheatMap 
+```{r}
+
+Anno <- data.frame(Log2FC = IR_RMATS_sig$IncLevelDifference)
+
+rownames(IR_RMATS) <- IR_RMATS$EVENT
+rownames(Anno) <- IR_RMATS$EVENT
+
+
+
+pheatmap(IR_RMATS_sig[18:23], cluster_rows=F, show_rownames=F,
+         cluster_cols=F, main = "Filtered Events",border_color = F,
+         annotation_row = Anno,scale = "row",
+         color=colorRampPalette(c("red", "white", "blue"))(1000),
+         fontsize = 12)
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

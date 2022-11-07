@@ -54,7 +54,12 @@ WTvT200M_ri_jc <- na.omit(WTvT200M_ri_jc)
 ```
 Filtering WT vs T200M RI JC average reads, abs(IncLevelDifference), and FDR 
 ```{r}
-WTvT200M_ri_jc <- subset(WTvT200M_ri_jc,
+WTvT200M_ri_jc2 <- subset(WTvT200M_ri_jc,
+                         apply(WTvT200M_ri_jc[c(1:6)], MARGIN =  1,mean)>=coverage
+                         &apply(WTvT200M_ri_jc[c(7:12)], MARGIN =  1,mean)>=coverage)
+                         
+
+WTvT200M_ri_jc3 <- subset(WTvT200M_ri_jc,
                          apply(WTvT200M_ri_jc[c(1,4)], MARGIN =  1,mean)>=coverage
                          &apply(WTvT200M_ri_jc[c(2,5)], MARGIN =  1,mean)>=coverage
                          &apply(WTvT200M_ri_jc[c(3,6)], MARGIN =  1,mean)>=coverage
@@ -62,7 +67,9 @@ WTvT200M_ri_jc <- subset(WTvT200M_ri_jc,
                          &apply(WTvT200M_ri_jc[c(8,11)], MARGIN =  1,mean)>=coverage
                          &apply(WTvT200M_ri_jc[c(9,12)], MARGIN =  1,mean)>=coverage)
 
-WTvT200M_ri_jc <- subset(WTvT200M_ri_jc, abs(IncLevelDifference) >= IncLevelDifference.variable & FDR <= FDR.variable)
+WTvT200M_ri_jc2 <- subset(WTvT200M_ri_jc2, abs(IncLevelDifference) >= IncLevelDifference.variable & FDR <= FDR.variable)
+WTvT200M_ri_jc3 <- subset(WTvT200M_ri_jc3, abs(IncLevelDifference) >= IncLevelDifference.variable & FDR <= FDR.variable)
+
 ```
 
 
@@ -100,7 +107,12 @@ WTvT200M_se_jc <- na.omit(WTvT200M_se_jc)
 
 Filtering WT vs T200M SE JC by average reads, abs(IncLevelDifference), and FDR 
 ```{r}
-WTvT200M_se_jc <- subset(WTvT200M_se_jc,
+WTvT200M_se_jc2 <- subset(WTvT200M_se_jc,
+                         apply(WTvT200M_se_jc[c(1:6)], MARGIN =  1,mean)>=coverage
+                         &apply(WTvT200M_se_jc[c(7:12)], MARGIN =  1,mean)>=coverage)
+                         
+
+WTvT200M_se_jc3 <- subset(WTvT200M_se_jc,
                          apply(WTvT200M_se_jc[c(1,4)], MARGIN =  1,mean)>=coverage
                          &apply(WTvT200M_se_jc[c(2,5)], MARGIN =  1,mean)>=coverage
                          &apply(WTvT200M_se_jc[c(3,6)], MARGIN =  1,mean)>=coverage
@@ -108,7 +120,8 @@ WTvT200M_se_jc <- subset(WTvT200M_se_jc,
                          &apply(WTvT200M_se_jc[c(8,11)], MARGIN =  1,mean)>=coverage
                          &apply(WTvT200M_se_jc[c(9,12)], MARGIN =  1,mean)>=coverage)
 
-WTvT200M_se_jc <- subset(WTvT200M_se_jc, abs(IncLevelDifference) >= IncLevelDifference.variable & FDR <= FDR.variable)
+WTvT200M_se_jc2 <- subset(WTvT200M_se_jc2, abs(IncLevelDifference) >= IncLevelDifference.variable & FDR <= FDR.variable)
+WTvT200M_se_jc3 <- subset(WTvT200M_se_jc3, abs(IncLevelDifference) >= IncLevelDifference.variable & FDR <= FDR.variable)
 ```
 
 
@@ -147,7 +160,12 @@ WTvT200M_a3ss_jc <- na.omit(WTvT200M_a3ss_jc)
 
 Filtering WT vs T200M A3SS JC by average reads, abs(IncLevelDifference), and FDR 
 ```{r}
-WTvT200M_a3ss_jc <- subset(WTvT200M_a3ss_jc,
+WTvT200M_a3ss_jc2 <- subset(WTvT200M_a3ss_jc,
+                         apply(WTvT200M_a3ss_jc[c(1:6)], MARGIN =  1,mean)>=coverage
+                         &apply(WTvT200M_a3ss_jc[c(7:12)], MARGIN =  1,mean)>=coverage)
+                         
+
+WTvT200M_a3ss_jc3 <- subset(WTvT200M_a3ss_jc,
                          apply(WTvT200M_a3ss_jc[c(1,4)], MARGIN =  1,mean)>=coverage
                          &apply(WTvT200M_a3ss_jc[c(2,5)], MARGIN =  1,mean)>=coverage
                          &apply(WTvT200M_a3ss_jc[c(3,6)], MARGIN =  1,mean)>=coverage
@@ -155,7 +173,8 @@ WTvT200M_a3ss_jc <- subset(WTvT200M_a3ss_jc,
                          &apply(WTvT200M_a3ss_jc[c(8,11)], MARGIN =  1,mean)>=coverage
                          &apply(WTvT200M_a3ss_jc[c(9,12)], MARGIN =  1,mean)>=coverage)
 
-WTvT200M_a3ss_jc <- subset(WTvT200M_a3ss_jc, abs(IncLevelDifference) >= IncLevelDifference.variable & FDR <= FDR.variable)
+WTvT200M_a3ss_jc2 <- subset(WTvT200M_a3ss_jc2, abs(IncLevelDifference) >= IncLevelDifference.variable & FDR <= FDR.variable)
+WTvT200M_a3ss_jc3 <- subset(WTvT200M_a3ss_jc3, abs(IncLevelDifference) >= IncLevelDifference.variable & FDR <= FDR.variable)
 ```
 
 
@@ -195,7 +214,12 @@ WTvT200M_a5ss_jc <- na.omit(WTvT200M_a5ss_jc)
 
 Filtering WT vs T200M A5SS JC by average reads, abs(IncLevelDifference), and FDR 
 ```{r}
-WTvT200M_a5ss_jc <- subset(WTvT200M_a5ss_jc,
+WTvT200M_a5ss_jc2 <- subset(WTvT200M_a5ss_jc,
+                         apply(WTvT200M_a5ss_jc[c(1:6)], MARGIN =  1,mean)>=coverage
+                         &apply(WTvT200M_a5ss_jc[c(7:12)], MARGIN =  1,mean)>=coverage)
+                         
+
+WTvT200M_a5ss_jc3 <- subset(WTvT200M_a5ss_jc,
                          apply(WTvT200M_a5ss_jc[c(1,4)], MARGIN =  1,mean)>=coverage
                          &apply(WTvT200M_a5ss_jc[c(2,5)], MARGIN =  1,mean)>=coverage
                          &apply(WTvT200M_a5ss_jc[c(3,6)], MARGIN =  1,mean)>=coverage
@@ -203,7 +227,8 @@ WTvT200M_a5ss_jc <- subset(WTvT200M_a5ss_jc,
                          &apply(WTvT200M_a5ss_jc[c(8,11)], MARGIN =  1,mean)>=coverage
                          &apply(WTvT200M_a5ss_jc[c(9,12)], MARGIN =  1,mean)>=coverage)
 
-WTvT200M_a5ss_jc <- subset(WTvT200M_a5ss_jc, abs(IncLevelDifference) >= IncLevelDifference.variable & FDR <= FDR.variable)
+WTvT200M_a5ss_jc2 <- subset(WTvT200M_a5ss_jc2, abs(IncLevelDifference) >= IncLevelDifference.variable & FDR <= FDR.variable)
+WTvT200M_a5ss_jc3 <- subset(WTvT200M_a5ss_jc3, abs(IncLevelDifference) >= IncLevelDifference.variable & FDR <= FDR.variable)
 ```
 
 
@@ -242,7 +267,12 @@ WTvT200M_mxe_jc <- na.omit(WTvT200M_mxe_jc)
 
 Filtering WT vs T200M MXE JC by average reads, abs(IncLevelDifference), and FDR 
 ```{r}
-WTvT200M_mxe_jc <- subset(WTvT200M_mxe_jc,
+WTvT200M_mxe_jc2 <- subset(WTvT200M_mxe_jc,
+                         apply(WTvT200M_mxe_jc[c(1:6)], MARGIN =  1,mean)>=coverage
+                         &apply(WTvT200M_mxe_jc[c(7:12)], MARGIN =  1,mean)>=coverage)
+                         
+
+WTvT200M_mxe_jc3 <- subset(WTvT200M_mxe_jc,
                          apply(WTvT200M_mxe_jc[c(1,4)], MARGIN =  1,mean)>=coverage
                          &apply(WTvT200M_mxe_jc[c(2,5)], MARGIN =  1,mean)>=coverage
                          &apply(WTvT200M_mxe_jc[c(3,6)], MARGIN =  1,mean)>=coverage
@@ -250,45 +280,100 @@ WTvT200M_mxe_jc <- subset(WTvT200M_mxe_jc,
                          &apply(WTvT200M_mxe_jc[c(8,11)], MARGIN =  1,mean)>=coverage
                          &apply(WTvT200M_mxe_jc[c(9,12)], MARGIN =  1,mean)>=coverage)
 
-WTvT200M_mxe_jc <- subset(WTvT200M_mxe_jc, abs(IncLevelDifference) >= IncLevelDifference.variable & FDR <= FDR.variable)
+WTvT200M_mxe_jc2 <- subset(WTvT200M_mxe_jc2, abs(IncLevelDifference) >= IncLevelDifference.variable & FDR <= FDR.variable)
+WTvT200M_mxe_jc3 <- subset(WTvT200M_mxe_jc3, abs(IncLevelDifference) >= IncLevelDifference.variable & FDR <= FDR.variable)
 ```
 
 
 
 
 
-Combining ALL AS EVENTS that have been filtered
+Combining ALL AS EVENTS  and those filtered(2,3)
 ```{r}
 WTvT200M_jc <- rbind(WTvT200M_ri_jc,WTvT200M_se_jc,WTvT200M_a3ss_jc,WTvT200M_a5ss_jc,WTvT200M_mxe_jc)
 rownames(WTvT200M_jc) <- rownames(WTvT200M_jc$EVENT)
 colnames(WTvT200M_jc)<-gsub("IncLevel_","PSI_",colnames(WTvT200M_jc))
 WTvT200M_jc$Event <-ifelse(WTvT200M_jc$IncLevelDifference > 0,"WT","T200M")
-write.csv(WTvT200M_jc,"WTvsT200M-50counts-filtered.csv")
-write.csv(WTvT200M_ri_jc,"WTvsT200M-RI-50counts-filtered.csv")
+
+
+WTvT200M_jc2 <- rbind(WTvT200M_ri_jc2,WTvT200M_se_jc2,WTvT200M_a3ss_jc2,WTvT200M_a5ss_jc2,WTvT200M_mxe_jc2)
+rownames(WTvT200M_jc2) <- rownames(WTvT200M_jc2$EVENT)
+colnames(WTvT200M_jc2)<-gsub("IncLevel_","PSI_",colnames(WTvT200M_jc2))
+WTvT200M_jc2$Event <-ifelse(WTvT200M_jc2$IncLevelDifference > 0,"WT","T200M")
+
+
+
+WTvT200M_jc3 <- rbind(WTvT200M_ri_jc3,WTvT200M_se_jc3,WTvT200M_a3ss_jc3,WTvT200M_a5ss_jc3,WTvT200M_mxe_jc3)
+rownames(WTvT200M_jc3) <- rownames(WTvT200M_jc3$EVENT)
+colnames(WTvT200M_jc3)<-gsub("IncLevel_","PSI_",colnames(WTvT200M_jc3))
+WTvT200M_jc3$Event <-ifelse(WTvT200M_jc3$IncLevelDifference > 0,"WT","T200M")
+
+
+
+# write.csv(WTvT200M_jc,"WTvsT200M-50counts-filtered.csv")
+# write.csv(WTvT200M_ri_jc,"WTvsT200M-RI-50counts-filtered.csv")
 ```
 
 
 
-PheatMap 
+PheatMap all events
 ```{r}
 
-Anno <- data.frame(EVENT = WTvT200M_jc$events)
+Anno <- data.frame(EVENT = WTvT200M_jc$events,PSIDelta = WTvT200M_jc$Event)
 
 rownames(WTvT200M_jc) <- WTvT200M_jc$EVENT
 rownames(Anno) <- WTvT200M_jc$EVENT
 
+WTvT200M_jc <- WTvT200M_jc[order(WTvT200M_jc$events,WTvT200M_jc$Event),]
+
 pheatmap(WTvT200M_jc[17:22], cluster_rows=F, show_rownames=F,
          cluster_cols=F, main = "Filtered Events",border_color = F,
          annotation_row = Anno,scale = "row",
-         color=colorRampPalette(c("red", "white", "blue"))(200),
-         fontsize = 12)
+         color=colorRampPalette(c("red", "white", "blue"))(73000),
+         fontsize = 12,cellwidth = 13)
 ```
+PheatMap filtered by avg reads across conditions
 ```{r}
 
+Anno <- data.frame(EVENT = WTvT200M_jc2$events,PSIDelta = WTvT200M_jc2$Event)
+
+rownames(WTvT200M_jc2) <- WTvT200M_jc2$EVENT
+rownames(Anno) <- WTvT200M_jc2$EVENT
+
+WTvT200M_jc2 <- WTvT200M_jc2[order(WTvT200M_jc2$events,WTvT200M_jc2$Event),]
+
+pheatmap(WTvT200M_jc2[17:22], cluster_rows=F, show_rownames=F,
+         cluster_cols=F, main = "Filtered Events",border_color = F,
+         annotation_row = Anno,scale = "row",
+         color=colorRampPalette(c("red", "white", "blue"))(400),
+         fontsize = 12,cellwidth = 13)
 ```
 
 
-Plots
+
+
+
+
+
+
+PheatMap filtered by avg reads across reps
+```{r}
+
+Anno <- data.frame(EVENT = WTvT200M_jc3$events,PSIDelta = WTvT200M_jc3$Event)
+
+rownames(WTvT200M_jc3) <- WTvT200M_jc3$EVENT
+rownames(Anno) <- WTvT200M_jc3$EVENT
+
+WTvT200M_jc3 <- WTvT200M_jc3[order(WTvT200M_jc3$events,WTvT200M_jc3$Event),]
+
+pheatmap(WTvT200M_jc3[17:22], cluster_rows=F, show_rownames=F,
+         cluster_cols=F, main = "Filtered Events",border_color = F,
+         annotation_row = Anno,scale = "row",
+         color=colorRampPalette(c("red", "white", "blue"))(219),
+         fontsize = 12, cellwidth = 13)
+```
+
+Plots for all AS events
 ```{r}
 a <- ggplot(data = WTvT200M_jc,mapping= 
               aes(x =IncLevelDifference,y =-log10(FDR),color=Event))+ theme_classic() + geom_point() + 
@@ -301,7 +386,7 @@ a <- a + theme(plot.title = element_text(color="black", size=20, face="bold.ital
          legend.title = element_text(size=20))  
 
 b <- ggplot(WTvT200M_jc, aes("WTvT200M", y=IncLevelDifference)) + 
-   theme_classic()+ ggtitle("WT vs T200M PSI") + ylab("IncLevelDifference") + geom_violin()
+   theme_classic()+ ggtitle("WT vs T200M PSI") + labs( y = "IncLevelDifference", x = " ") + geom_violin()
 
 b <- b + geom_boxplot(width=0.2)+ 
   theme(plot.title = element_text(color="black", size=20, face="bold.italic"),
@@ -310,7 +395,7 @@ b <- b + geom_boxplot(width=0.2)+
          axis.text = element_text(size = 20))
  
 c <- ggplot(data = WTvT200M_ri_jc,mapping= 
-              aes(IncLevelDifference,-log(FDR)))+ theme_classic() + geom_point(color = ifelse(WTvT200M_ri_jc$IncLevelDifference >= 0.1 ,"blue","red")) + 
+              aes(IncLevelDifference,-log(FDR)))+ theme_classic() + geom_point(color = ifelse(WTvT200M_ri_jc$IncLevelDifference > 0 ,"blue","red")) + 
   theme_classic()+ ggtitle("WT vs. T200M RI Percent Spliced In") +xlab("PSI") + ylab("-log10(FDR)")
 c <- c + theme(plot.title = element_text(color="black", size=20, face="bold.italic"),
          axis.title.x = element_text(color="black", size=20, face="bold"),
@@ -321,7 +406,7 @@ c <- c + theme(plot.title = element_text(color="black", size=20, face="bold.ital
 
 
 d <- ggplot(WTvT200M_ri_jc, aes(x="WTvT200M", y=IncLevelDifference)) + 
-   theme_classic()+ ggtitle("WT vs T200M RI PSI") + ylab("IncLevelDifference") + geom_violin()
+   theme_classic()+ ggtitle("WT vs T200M RI PSI") + labs( y = "IncLevelDifference", x = " ") + geom_violin()
 d <- d + geom_boxplot(width=0.2)+ 
   theme(plot.title = element_text(color="black", size=20, face="bold.italic"),
          axis.title.x = element_text(color="black", size=20, face="bold"),
@@ -331,11 +416,124 @@ d <- d + geom_boxplot(width=0.2)+
 
 
 
-sg <- ggarrange(a,b,c,d,
+all_events <- ggarrange(a,b,c,d,
           labels = c("A", "B", "C", "D"),
           ncol = 2, nrow = 2)
-sg
+
+all_events
 ```
+
+
+
+Plots for AS events filtered by avg reads across conditions
+```{r}
+a <- ggplot(data = WTvT200M_jc2,mapping= 
+              aes(x =IncLevelDifference,y =-log10(FDR),color=Event))+ theme_classic() + geom_point() + 
+   ggtitle("WT vs. T200M Percent Spliced In") +xlab("PSI") + ylab("-log10(FDR)") + scale_color_manual(values=c("red", "blue"))
+a <- a + theme(plot.title = element_text(color="black", size=20, face="bold.italic"),
+         axis.title.x = element_text(color="black", size=20, face="bold"),
+         axis.title.y = element_text(color="black", size=20, face="bold"),
+         axis.text = element_text(size = 20),
+         legend.text = element_text(size=17),
+         legend.title = element_text(size=20))  
+
+b <- ggplot(WTvT200M_jc2, aes("WTvT200M", y=IncLevelDifference)) + 
+   theme_classic()+ ggtitle("WT vs T200M PSI") + labs( y = "IncLevelDifference", x = " ") + geom_violin()
+
+b <- b + geom_boxplot(width=0.2)+ 
+  theme(plot.title = element_text(color="black", size=20, face="bold.italic"),
+         axis.title.x = element_text(color="black", size=20, face="bold"),
+         axis.title.y = element_text(color="black", size=20, face="bold"),
+         axis.text = element_text(size = 20))
+ 
+c <- ggplot(data = WTvT200M_ri_jc2,mapping= 
+              aes(IncLevelDifference,-log(FDR)))+ theme_classic() + geom_point(color = ifelse(WTvT200M_ri_jc2$IncLevelDifference > 0 ,"blue","red")) + 
+  theme_classic()+ ggtitle("WT vs. T200M RI Percent Spliced In") +xlab("PSI") + ylab("-log10(FDR)")
+c <- c + theme(plot.title = element_text(color="black", size=20, face="bold.italic"),
+         axis.title.x = element_text(color="black", size=20, face="bold"),
+         axis.title.y = element_text(color="black", size=20, face="bold"),
+         axis.text = element_text(size = 20),
+         legend.text = element_text(size=17),
+         legend.title = element_text(size=20)) 
+
+
+d <- ggplot(WTvT200M_ri_jc2, aes(x="WTvT200M", y=IncLevelDifference)) + 
+   theme_classic()+ ggtitle("WT vs T200M RI PSI") + labs( y = "IncLevelDifference", x = " ") + geom_violin()
+d <- d + geom_boxplot(width=0.2)+ 
+  theme(plot.title = element_text(color="black", size=20, face="bold.italic"),
+         axis.title.x = element_text(color="black", size=20, face="bold"),
+         axis.title.y = element_text(color="black", size=20, face="bold"),
+         axis.text = element_text(size = 20)) 
+
+
+
+
+across_conditions <- ggarrange(a,b,c,d,
+          labels = c("A", "B", "C", "D"),
+          ncol = 2, nrow = 2)
+
+across_conditions
+```
+
+
+Plots for AS events filtered by avg reads across reps
+```{r}
+a <- ggplot(data = WTvT200M_jc3,mapping= 
+              aes(x =IncLevelDifference,y =-log10(FDR),color=Event))+ theme_classic() + geom_point() + 
+   ggtitle("WT vs. T200M Percent Spliced In") +xlab("PSI") + ylab("-log10(FDR)") + scale_color_manual(values=c("red", "blue"))
+a <- a + theme(plot.title = element_text(color="black", size=20, face="bold.italic"),
+         axis.title.x = element_text(color="black", size=20, face="bold"),
+         axis.title.y = element_text(color="black", size=20, face="bold"),
+         axis.text = element_text(size = 20),
+         legend.text = element_text(size=17),
+         legend.title = element_text(size=20))  
+
+b <- ggplot(WTvT200M_jc3, aes("WTvT200M", y=IncLevelDifference)) + 
+   theme_classic()+ ggtitle("WT vs T200M PSI") + labs( y = "IncLevelDifference", x = " ") + geom_violin()
+
+b <- b + geom_boxplot(width=0.2)+ 
+  theme(plot.title = element_text(color="black", size=20, face="bold.italic"),
+         axis.title.x = element_text(color="black", size=20, face="bold"),
+         axis.title.y = element_text(color="black", size=20, face="bold"),
+         axis.text = element_text(size = 20))
+ 
+c <- ggplot(data = WTvT200M_ri_jc3,mapping= 
+              aes(IncLevelDifference,-log(FDR)))+ theme_classic() + geom_point(color = ifelse(WTvT200M_ri_jc3$IncLevelDifference > 0 ,"blue","red")) + 
+  theme_classic()+ ggtitle("WT vs. T200M RI Percent Spliced In") +xlab("PSI") + ylab("-log10(FDR)")
+c <- c + theme(plot.title = element_text(color="black", size=20, face="bold.italic"),
+         axis.title.x = element_text(color="black", size=20, face="bold"),
+         axis.title.y = element_text(color="black", size=20, face="bold"),
+         axis.text = element_text(size = 20),
+         legend.text = element_text(size=17),
+         legend.title = element_text(size=20)) 
+
+
+d <- ggplot(WTvT200M_ri_jc3, aes(x="WTvT200M", y=IncLevelDifference)) + 
+   theme_classic()+ ggtitle("WT vs T200M RI PSI") + labs( y = "IncLevelDifference", x = " ") + geom_violin()
+d <- d + geom_boxplot(width=0.2)+ 
+  theme(plot.title = element_text(color="black", size=20, face="bold.italic"),
+         axis.title.x = element_text(color="black", size=20, face="bold"),
+         axis.title.y = element_text(color="black", size=20, face="bold"),
+         axis.text = element_text(size = 20)) 
+
+
+
+
+across_reps <- ggarrange(a,b,c,d,
+          labels = c("A", "B", "C", "D"),
+          ncol = 2, nrow = 2)
+
+across_reps
+```
+
+
+
+
+
+
+
+
+
 looking at specific genes
 ```{r}
 WTvT200M_GENE <- subset(WTvT200M_ri_jc,EVENT=='MRNIP_chr5:-:179837275:179840959:179837275:179837885:179840871:179840959')
