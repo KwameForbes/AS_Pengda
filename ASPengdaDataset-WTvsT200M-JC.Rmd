@@ -310,8 +310,8 @@ WTvT200M_jc3$Event <-ifelse(WTvT200M_jc3$IncLevelDifference > 0,"WT","T200M")
 
 
 
-# write.csv(WTvT200M_jc,"WTvsT200M-50counts-filtered.csv")
-# write.csv(WTvT200M_ri_jc,"WTvsT200M-RI-50counts-filtered.csv")
+write.csv(WTvT200M_jc2,"WTvsT200M-50counts-filtered.csv")
+write.csv(WTvT200M_ri_jc2,"WTvsT200M-RI-50counts-filtered.csv")
 ```
 
 
@@ -327,7 +327,7 @@ rownames(Anno) <- WTvT200M_jc$EVENT
 WTvT200M_jc <- WTvT200M_jc[order(WTvT200M_jc$events,WTvT200M_jc$Event),]
 
 pheatmap(WTvT200M_jc[17:22], cluster_rows=F, show_rownames=F,
-         cluster_cols=F, main = "Filtered Events",border_color = F,
+         cluster_cols=F, main = "All Events",border_color = F,
          annotation_row = Anno,scale = "row",
          color=colorRampPalette(c("red", "white", "blue"))(73000),
          fontsize = 12,cellwidth = 13)
@@ -343,7 +343,7 @@ rownames(Anno) <- WTvT200M_jc2$EVENT
 WTvT200M_jc2 <- WTvT200M_jc2[order(WTvT200M_jc2$events,WTvT200M_jc2$Event),]
 
 pheatmap(WTvT200M_jc2[17:22], cluster_rows=F, show_rownames=F,
-         cluster_cols=F, main = "Filtered Events",border_color = F,
+         cluster_cols=F, main = "Filtered Events across conditions",border_color = F,
          annotation_row = Anno,scale = "row",
          color=colorRampPalette(c("red", "white", "blue"))(400),
          fontsize = 12,cellwidth = 13)
@@ -367,7 +367,7 @@ rownames(Anno) <- WTvT200M_jc3$EVENT
 WTvT200M_jc3 <- WTvT200M_jc3[order(WTvT200M_jc3$events,WTvT200M_jc3$Event),]
 
 pheatmap(WTvT200M_jc3[17:22], cluster_rows=F, show_rownames=F,
-         cluster_cols=F, main = "Filtered Events",border_color = F,
+         cluster_cols=F, main = "Filtered Events across reps",border_color = F,
          annotation_row = Anno,scale = "row",
          color=colorRampPalette(c("red", "white", "blue"))(219),
          fontsize = 12, cellwidth = 13)
